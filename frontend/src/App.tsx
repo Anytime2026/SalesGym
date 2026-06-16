@@ -5,6 +5,7 @@ import PhaseIndicator from "./components/PhaseIndicator";
 import ChatWindow from "./components/ChatWindow";
 import InputBar from "./components/InputBar";
 import { sendMessage, resetSession } from "./services/api";
+import { useSpeechSynthesis } from "./hooks/useSpeechSynthesis";
 import type { ChatMessage, Phase } from "./types";
 
 const STORAGE_KEY = "salesRoleplay";
@@ -39,6 +40,10 @@ function App() {
   const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
   const [phase, setPhase] = useState<Phase>(loadPhase);
   const [loading, setLoading] = useState(false);
+  const [muted, setMuted] = useState(false);
+
+  const { speak, stop: stopSpeaking, speaking, supported: ttsSupported } =
+    useSpeechSynthesis();
 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}_messages`, JSON.stringify(messages));
@@ -49,6 +54,7 @@ function App() {
   }, [phase]);
 
   const handleSend = async (text: string) => {
+    stopSpeaking();
     const userMessage: ChatMessage = { role: "user", content: text };
     const updated = [...messages, userMessage];
     setMessages(updated);
@@ -62,6 +68,7 @@ function App() {
       };
       setMessages([...updated, aiMessage]);
       setPhase(result.phase);
+      if (!muted) speak(result.message);
     } catch (err) {
       const errorMessage: ChatMessage = {
         role: "assistant",
@@ -76,6 +83,7 @@ function App() {
   };
 
   const handleReset = async () => {
+    stopSpeaking();
     await resetSession(sessionId);
     const newSessionId = `session_${Date.now()}`;
     localStorage.setItem(`${STORAGE_KEY}_sessionId`, newSessionId);
@@ -84,12 +92,27 @@ function App() {
     setPhase("greeting");
   };
 
+  const handleToggleMute = () => {
+    if (!muted) stopSpeaking();
+    setMuted((m) => !m);
+  };
+
   return (
     <div className="app">
-      <Header onReset={handleReset} />
+      <Header
+        onReset={handleReset}
+        muted={muted}
+        speaking={speaking}
+        ttsSupported={ttsSupported}
+        onToggleMute={handleToggleMute}
+      />
       <PhaseIndicator phase={phase} />
       <ChatWindow messages={messages} loading={loading} />
-      <InputBar onSend={handleSend} disabled={loading} />
+      <InputBar
+        onSend={handleSend}
+        disabled={loading}
+        onBeforeListen={stopSpeaking}
+      />
     </div>
   );
 }

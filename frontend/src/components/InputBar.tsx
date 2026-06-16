@@ -5,9 +5,14 @@ import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 interface InputBarProps {
   onSend: (text: string) => void;
   disabled: boolean;
+  onBeforeListen?: () => void;
 }
 
-export default function InputBar({ onSend, disabled }: InputBarProps) {
+export default function InputBar({
+  onSend,
+  disabled,
+  onBeforeListen,
+}: InputBarProps) {
   const [text, setText] = useState("");
   const baseTextRef = useRef("");
 
@@ -27,6 +32,7 @@ export default function InputBar({ onSend, disabled }: InputBarProps) {
     if (listening) {
       stop();
     } else {
+      onBeforeListen?.();
       baseTextRef.current = text;
       start();
     }

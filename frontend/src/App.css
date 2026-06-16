@@ -35,6 +35,13 @@
   opacity: 0.9;
 }
 
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .app-header__reset {
   flex-shrink: 0;
   border: none;
@@ -50,6 +57,35 @@
 
 .app-header__reset:hover {
   background: var(--color-orange-dark);
+}
+
+.app-header__mute {
+  flex-shrink: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  font-size: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.app-header__mute:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.app-header__mute--active {
+  animation: mute-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes mute-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
 }
 
 /* Phase indicator */
