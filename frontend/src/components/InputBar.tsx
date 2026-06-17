@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 
@@ -17,6 +17,9 @@ export default function InputBar({
 }: InputBarProps) {
   const [text, setText] = useState("");
   const baseTextRef = useRef("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const startedByKeyRef = useRef(false);
+  const keyHeldRef = useRef(false);
 
   const handleSpeechResult = (transcript: string, isFinal: boolean) => {
     if (isFinal) {
@@ -30,12 +33,22 @@ export default function InputBar({
   const { listening, supported, start, stop } =
     useSpeechRecognition(handleSpeechResult);
 
+  const listeningRef = useRef(listening);
+  useEffect(() => {
+    listeningRef.current = listening;
+  }, [listening]);
+
+  const disabledRef = useRef(disabled);
+  useEffect(() => {
+    disabledRef.current = disabled;
+  }, [disabled]);
+
   const handleMicClick = () => {
     if (listening) {
       stop();
+      startedByKeyRef.current = false;
     } else {
       onBeforeListen?.();
-      baseTextRef.current = text;
       start();
     }
   };
@@ -56,10 +69,51 @@ export default function InputBar({
     }
   };
 
+  // スペースキー押している間だけ音声入力（テキストエリア未フォーカス時）
+  useEffect(() => {
+    if (!supported) return;
+
+    const onKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (
+        e.code === "Space" &&
+        !e.repeat &&
+        !keyHeldRef.current &&
+        !disabledRef.current &&
+        document.activeElement !== textareaRef.current
+      ) {
+        e.preventDefault();
+        keyHeldRef.current = true;
+        if (!listeningRef.current) {
+          startedByKeyRef.current = true;
+          onBeforeListen?.();
+          start();
+        }
+      }
+    };
+
+    const onKeyUp = (e: globalThis.KeyboardEvent) => {
+      if (e.code === "Space" && keyHeldRef.current) {
+        keyHeldRef.current = false;
+        if (startedByKeyRef.current) {
+          startedByKeyRef.current = false;
+          stop();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keyup", onKeyUp);
+    };
+  }, [supported, start, stop, onBeforeListen]);
+
   return (
     <div className="input-bar-wrapper">
       <div className="input-bar">
         <textarea
+          ref={textareaRef}
           className="input-bar__textarea"
           placeholder={`${personLabel}への質問を入力してください（Enterで送信、Shift+Enterで改行）`}
           value={text}
@@ -94,7 +148,7 @@ export default function InputBar({
       </div>
       {supported && (
         <p className="input-bar__notice">
-          ※音声入力はブラウザの音声認識機能を使用します。Chrome等では音声がブラウザ提供元（Google等）のサーバーで文字変換処理されます。
+          ※音声入力：🎤ボタンで切り替え、またはテキスト入力欄以外でスペースキーを押している間だけ録音できます。Chrome等では音声がブラウザ提供元のサーバーで処理されます。
         </p>
       )}
     </div>
