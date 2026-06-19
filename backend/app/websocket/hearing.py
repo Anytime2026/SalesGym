@@ -80,21 +80,29 @@ async def hearing_websocket(websocket: WebSocket, session_id: UUID) -> None:
                     remaining = _remaining_seconds(session)  # type: ignore[arg-type]
 
                 system = pipeline.build_system_prompt(profile, state, session.goal, remaining)  # type: ignore[arg-type]
-                user_text, ai_text, audio_out = await asyncio.to_thread(
-                    pipeline.process_turn,
-                    bytes(audio_buffer),
-                    system,
-                    media_format,
-                )
+
+                user_text = await pipeline.transcribe_turn(bytes(audio_buffer), media_format)
                 audio_buffer = bytearray()
 
-                sessions_routes.append_conversation(str(session_id), "user", user_text)
-                sessions_routes.append_conversation(str(session_id), "ai", ai_text)
+                if not user_text.strip():
+                    await websocket.send_json({"type": "error", "message": "No speech detected"})
+                    await websocket.send_json({"type": "turn_complete"})
+                    continue
 
+                sessions_routes.append_conversation(str(session_id), "user", user_text)
                 await websocket.send_json({"type": "transcript", "speaker": "user", "text": user_text})
+
+                loop = asyncio.get_running_loop()
+
+                def emit_audio(audio: bytes) -> None:
+                    asyncio.run_coroutine_threadsafe(websocket.send_bytes(audio), loop).result()
+
+                ai_text = await asyncio.to_thread(
+                    pipeline.stream_ai_audio, system, user_text, emit_audio
+                )
+
+                sessions_routes.append_conversation(str(session_id), "ai", ai_text)
                 await websocket.send_json({"type": "transcript", "speaker": "ai", "text": ai_text})
-                if audio_out:
-                    await websocket.send_bytes(audio_out)
                 await websocket.send_json({"type": "turn_complete"})
 
             if msg_type == "ping":
