@@ -16,15 +16,32 @@ export interface Program {
   currentSessionCount: number;
   status: 'created' | 'active' | 'completed' | 'reviewed';
   createdAt: string;
+  personality_type?: string;
+  customerItLevel?: string;
+}
+
+export interface AiEvaluation {
+  score: string;
+  comment: string;
+  questions: string[];
+}
+
+export interface ProgramReview {
+  trueProblemRevealed: string;
+  overallComment: string;
+  overallQuestions: string[];
+  createdAt: string;
 }
 
 export interface CustomerProfile {
   program_id: string;
   industry: Industry;
-  company: string;
-  personName: string;
-  role: string;
-  trueProblem: string; // Hidden from user until final review
+  company_size: string;
+  role_title: string;
+  surface_need: string;
+  true_challenge: string;
+  personality_type: string;
+  initial_awareness: number;
 }
 
 export interface HearingSession {

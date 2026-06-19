@@ -6,7 +6,6 @@ import type { Program, HearingSession } from '../types'
 export function PreSessionPage() {
   const navigate = useNavigate()
   const [program, setProgram] = useState<Program | null>(null)
-  const [goal, setGoal] = useState('')
   const [timeLimit, setTimeLimit] = useState(5)
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export function PreSessionPage() {
       id: `sess_${Date.now()}`,
       program_id: program.id,
       session_number: program.currentSessionCount + 1,
-      goal,
+      goal: '',
       timeLimit,
       title: `${program.industry} ヒアリング #${program.currentSessionCount + 1}`,
       status: 'active',
@@ -48,23 +47,15 @@ export function PreSessionPage() {
   const meta = INDUSTRY_META[program.industry]
 
   return (
-    <div className="card">
+    <div className="card wide" style={{ maxWidth: '800px' }}>
       <h2>ヒアリング事前設定</h2>
       <p className="small">第 {program.currentSessionCount + 1} 回商談の設定</p>
 
-      <div style={{ background: '#f9f9f9', padding: 15, borderRadius: 10, marginBottom: 20 }}>
-        <p className="small" style={{ margin: 0 }}>相手担当者</p>
-        <p style={{ fontWeight: 'bold', margin: '5px 0' }}>{meta.personName} {meta.honorific}</p>
-        <p className="small" style={{ margin: 0 }}>{meta.company} / {meta.role}</p>
+      <div style={{ background: '#f9f9f9', padding: 20, borderRadius: 12, marginBottom: 20, border: '1px solid #eee' }}>
+        <p className="small" style={{ margin: 0, color: '#E91E63', fontWeight: 'bold' }}>相手担当者</p>
+        <p style={{ fontWeight: 'bold', fontSize: '18px', margin: '5px 0' }}>{meta.personName} {meta.honorific}</p>
+        <p className="small" style={{ margin: 0, opacity: 0.9 }}>{meta.company} / {meta.role}</p>
       </div>
-
-      <label>今回の目標</label>
-      <textarea 
-        placeholder="例：現在の業務フローを把握し、ボトルネックを聞き出す" 
-        value={goal}
-        onChange={e => setGoal(e.target.value)}
-        rows={3}
-      ></textarea>
 
       <label>制限時間 (分)</label>
       <input 
@@ -72,10 +63,13 @@ export function PreSessionPage() {
         value={timeLimit} 
         min="1" max="30" 
         onChange={e => setTimeLimit(parseInt(e.target.value))}
+        style={{ fontSize: '14px' }}
       />
 
-      <button className="btn cta" onClick={handleStartSession}>▶ ヒアリング開始</button>
-      <button className="btn secondary" onClick={() => navigate('/')}>戻る</button>
+      <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+        <button className="btn secondary" onClick={() => navigate('/')} style={{ flex: 1, margin: 0 }}>戻る</button>
+        <button className="btn cta" onClick={handleStartSession} style={{ flex: 2, margin: 0 }}>▶ ヒアリング開始</button>
+      </div>
     </div>
   )
 }

@@ -62,9 +62,9 @@ body {
 }
 
 /* 色定義 */
-.primary { background:#1C75BC; color:#fff; }
-.secondary { background:#5CC0EF; color:#fff; }
-.cta { background:#F9A638; color:#fff; font-weight:bold; }
+.primary { background:#E91E63; color:#fff; }
+.secondary { background:#F06292; color:#fff; }
+.cta { background:#FF5722; color:#fff; font-weight:bold; }
 
 /* 入力 */
 input, textarea, select {
@@ -170,3 +170,355 @@ label {
   margin-left:auto; 
   border-bottom-right-radius: 2px;
 }
+
+/* PC用広幅・レイアウト */
+.card.wide {
+  max-width: 900px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ZOOM風UIスタイル */
+.zoom-container {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 1100px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  margin: 20px;
+  height: 650px;
+  position: relative;
+}
+
+@media (max-width: 992px) {
+  .zoom-container {
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+  }
+  .zoom-chat-sidebar {
+    width: 100% !important;
+    height: 300px;
+  }
+}
+
+.zoom-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.zoom-video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 576px) {
+  .zoom-video-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.zoom-video-tile {
+  background: #2b2b2b;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  height: 100%;
+  min-height: 200px;
+}
+
+.zoom-video-tile.speaking {
+  border-color: #4CAF50;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+.zoom-video-tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.zoom-avatar-placeholder {
+  width: 90px;
+  height: 90px;
+  background: #424242;
+  color: #fff;
+  font-size: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid #555;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.zoom-participant-name {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+.zoom-speaking-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.65);
+  padding: 6px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #4CAF50;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.waveform-dot {
+  width: 3px;
+  height: 10px;
+  background: #4CAF50;
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+.waveform-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.waveform-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1.8); }
+}
+
+.zoom-subtitles {
+  background: rgba(0,0,0,0.8);
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  min-height: 54px;
+  text-align: center;
+  color: #fff;
+  margin: 15px 0;
+  border: 1px solid rgba(255,255,255,0.15);
+  word-break: break-all;
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  line-height: 1.4;
+}
+
+.zoom-control-bar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  align-items: center;
+  padding: 12px 0 0 0;
+  border-top: 1px solid #333;
+}
+
+.zoom-ctrl-btn {
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #fff;
+}
+
+.zoom-ctrl-btn:hover {
+  background: #444;
+  border-color: #555;
+  transform: scale(1.05);
+}
+
+.zoom-ctrl-btn.active {
+  background: #e53935;
+  border-color: #e53935;
+}
+
+.zoom-ctrl-btn.end-call {
+  background: #d32f2f;
+  border-color: #d32f2f;
+  border-radius: 24px;
+  width: auto;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: bold;
+  gap: 8px;
+}
+
+.zoom-ctrl-btn.end-call:hover {
+  background: #b71c1c;
+}
+
+.zoom-chat-sidebar {
+  width: 320px;
+  background: #222;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #333;
+  overflow: hidden;
+  height: 100%;
+}
+
+.zoom-chat-header {
+  padding: 15px;
+  border-bottom: 1px solid #333;
+  font-weight: bold;
+  font-size: 14px;
+  color: #eee;
+  background: #2a2a2a;
+}
+
+.zoom-chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zoom-chat-message {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  max-width: 85%;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.zoom-chat-message.ai {
+  background: #2a2d31;
+  color: #f1f1f1;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.zoom-chat-message.user {
+  background: #E91E63;
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+.zoom-chat-input-area {
+  padding: 15px;
+  border-top: 1px solid #333;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #222;
+}
+
+.zoom-chat-input-area input {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 20px;
+  margin: 0;
+  font-size: 13.5px;
+  flex: 1;
+}
+
+.zoom-chat-input-area input:focus {
+  border-color: #E91E63;
+  outline: none;
+}
+
+.zoom-chat-input-area input::placeholder {
+  color: #777;
+}
+
+.zoom-send-btn {
+  background: #E91E63;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.zoom-send-btn:hover {
+  transform: scale(1.05);
+}
+
+.zoom-chat-mic-btn {
+  background: #333;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.zoom-chat-mic-btn.active {
+  background: #ff4b4b;
+  border-color: #ff4b4b;
+  animation: pulse 1.5s infinite;
+}
+
