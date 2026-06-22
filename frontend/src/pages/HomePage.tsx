@@ -1,53 +1,86 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { ACTIVE_PROGRAM_STATUSES, getProgram } from '../lib/api'
+import { clearLocalData, loadRegistry, setCurrentProgramId } from '../lib/registry'
+import type { Program } from '../lib/types'
 import { INDUSTRY_META } from '../types'
-import type { Program } from '../types'
+
+type ActiveProgram = {
+  registryId: string
+  industry: keyof typeof INDUSTRY_META
+  program: Program
+}
 
 export function HomePage() {
-  const [programs, setPrograms] = useState<Program[]>([])
+  const [activePrograms, setActivePrograms] = useState<ActiveProgram[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const saved = localStorage.getItem('syodan_programs')
-    if (saved) {
-      try {
-        setPrograms(JSON.parse(saved))
-      } catch (e) {
-        console.error("Failed to parse programs", e)
-        localStorage.removeItem('syodan_programs')
-      }
+    const registry = loadRegistry()
+    if (registry.length === 0) {
+      setLoading(false)
+      return
     }
+
+    Promise.all(
+      registry.map(async (entry) => {
+        try {
+          const program = await getProgram(entry.id)
+          return { registryId: entry.id, industry: entry.industry, program }
+        } catch {
+          return null
+        }
+      }),
+    ).then((results) => {
+      const active = results.filter(
+        (r): r is ActiveProgram =>
+          r !== null && ACTIVE_PROGRAM_STATUSES.has(r.program.status),
+      )
+      setActivePrograms(active)
+      setLoading(false)
+    })
   }, [])
 
   const formatDate = (isoString: string) => {
-    const d = new Date(isoString);
-    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+    const d = new Date(isoString)
+    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`
   }
 
   const handleReset = () => {
-    if (window.confirm("過去のすべての商談履歴、評価データ、プログラム設定が消去されます。リセットしてよろしいですか？")) {
-      localStorage.clear()
-      setPrograms([])
-      alert("すべてのデータをクリアしました。新しい商談プログラムを作成してください。")
+    if (
+      window.confirm(
+        'ブラウザに保存したプログラム一覧と設定が消去されます。バックエンドのデータは残ります。リセットしてよろしいですか？',
+      )
+    ) {
+      clearLocalData()
+      setActivePrograms([])
+      alert('ローカルデータをクリアしました。新しい商談プログラムを作成してください。')
     }
   }
-
-  const activePrograms = programs.filter(p => p.status === 'active')
 
   return (
     <div className="card" style={{ maxWidth: '500px' }}>
       <h2 style={{ textAlign: 'center', color: '#E91E63', marginBottom: '8px' }}>営業ヒアリングロープレ</h2>
-      <p className="small" style={{ textAlign: 'center', marginBottom: '24px' }}>AI顧客を相手にしたロールプレイトレーニング</p>
+      <p className="small" style={{ textAlign: 'center', marginBottom: '24px' }}>
+        AI顧客を相手にしたロールプレイトレーニング
+      </p>
 
-      <Link to="/roleplay/setup" className="btn primary" style={{ padding: '16px' }}>▶ 新規プログラム作成</Link>
+      <Link to="/settings" className="btn primary" style={{ padding: '16px' }}>
+        ▶ 新規プログラム作成
+      </Link>
 
-      {activePrograms.length > 0 && (
+      {loading && <p className="small" style={{ marginTop: 16 }}>読み込み中…</p>}
+
+      {!loading && activePrograms.length > 0 && (
         <div style={{ marginTop: '25px', marginBottom: '15px' }}>
-          <p className="small" style={{ fontWeight: 'bold', margin: '0 0 10px 0', color: '#E91E63' }}>進行中のプログラム</p>
+          <p className="small" style={{ fontWeight: 'bold', margin: '0 0 10px 0', color: '#E91E63' }}>
+            進行中のプログラム
+          </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {activePrograms.map(p => (
+            {activePrograms.map(({ registryId, industry, program }) => (
               <Link
-                key={p.id}
-                to={`/roleplay/setup`}
+                key={registryId}
+                to="/pre-session"
                 className="btn secondary"
                 style={{
                   display: 'flex',
@@ -58,15 +91,16 @@ export function HomePage() {
                   background: '#FFF0F6',
                   color: '#E91E63',
                   border: '1px solid #FF80AB',
-                  borderRadius: '12px'
+                  borderRadius: '12px',
                 }}
-                onClick={() => localStorage.setItem('syodan_current_program_id', p.id)}
+                onClick={() => setCurrentProgramId(registryId)}
               >
                 <div style={{ fontWeight: 'bold', fontSize: '15px' }}>
-                  ⏱ {INDUSTRY_META[p.industry]?.label} - 進行中 ({p.currentSessionCount + 1} / {p.totalSessions}回目)
+                  ⏱ {INDUSTRY_META[industry]?.label} - 進行中 ({program.completed_sessions + 1} /{' '}
+                  {program.total_sessions}回目)
                 </div>
                 <div style={{ fontSize: '11px', opacity: 0.8, marginTop: '5px' }}>
-                  作成日: {formatDate(p.createdAt)}
+                  作成日: {formatDate(program.created_at)}
                 </div>
               </Link>
             ))}
@@ -74,7 +108,9 @@ export function HomePage() {
         </div>
       )}
 
-      <Link to="/evaluations" className="btn primary" style={{ marginTop: '12px', background: '#FF5722' }}>📊 評価履歴・総評一覧</Link>
+      <Link to="/evaluations" className="btn primary" style={{ marginTop: '12px', background: '#FF5722' }}>
+        📊 評価履歴・総評一覧
+      </Link>
 
       <div style={{ borderTop: '1px solid #eee', marginTop: '30px', paddingTop: '15px', textAlign: 'center' }}>
         <button
@@ -85,10 +121,10 @@ export function HomePage() {
             color: '#999',
             fontSize: '11px',
             textDecoration: 'underline',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
         >
-          ⚙️ データをリセットして最初から試す
+          ⚙️ ローカルデータをリセット
         </button>
       </div>
     </div>

@@ -10,7 +10,7 @@ from sqlalchemy import select
 from app.config import get_settings
 from app.db.session import AsyncSessionLocal
 from app.domain.enums import SessionStatus
-from app.domain.models import CustomerProfile, CustomerState, HearingSession
+from app.domain.models import CustomerProfile, CustomerState, HearingSession, Program
 from app.services.audio_pipeline import AudioPipeline
 from app.api.routes import sessions as sessions_routes
 
@@ -78,9 +78,13 @@ async def hearing_websocket(websocket: WebSocket, session_id: UUID) -> None:
                         session = await _load_session(db, session_id)
                         state = await _load_state(db, session.program_id)  # type: ignore[union-attr]
                         profile = await _load_profile(db, session.program_id)  # type: ignore[union-attr]
+                        program = await _load_program(db, session.program_id)  # type: ignore[union-attr]
                         remaining = _remaining_seconds(session)  # type: ignore[arg-type]
 
-                    system = pipeline.build_system_prompt(profile, state, session.goal, remaining)  # type: ignore[arg-type]
+                    profile_hints = program.profile_hints if program else None
+                    system = pipeline.build_system_prompt(
+                        profile, state, session.goal, remaining, profile_hints  # type: ignore[arg-type]
+                    )
 
                     try:
                         user_text = await pipeline.transcribe_turn(bytes(audio_buffer), media_format)
@@ -159,6 +163,11 @@ async def hearing_websocket(websocket: WebSocket, session_id: UUID) -> None:
 
 async def _load_session(db, session_id: UUID) -> HearingSession | None:
     result = await db.execute(select(HearingSession).where(HearingSession.id == session_id))
+    return result.scalar_one_or_none()
+
+
+async def _load_program(db, program_id: UUID) -> Program | None:
+    result = await db.execute(select(Program).where(Program.id == program_id))
     return result.scalar_one_or_none()
 
 
