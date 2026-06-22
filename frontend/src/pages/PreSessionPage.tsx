@@ -69,14 +69,14 @@ export function PreSessionPage() {
 
       <div
         style={{
-          background: '#f9f9f9',
+          background: 'var(--color-oat-cream)',
           padding: 20,
-          borderRadius: 12,
+          borderRadius: '24px',
           marginBottom: 20,
-          border: '1px solid #eee',
+          border: '2px solid var(--color-sticker-black)',
         }}
       >
-        <p className="small" style={{ margin: 0, color: '#E91E63', fontWeight: 'bold' }}>
+        <p className="small" style={{ margin: '0 0 4px 0', color: 'var(--color-ink-black)', fontWeight: 'bold' }}>
           相手情報
         </p>
         {profile ? (
@@ -120,18 +120,18 @@ export function PreSessionPage() {
 
       <div
         style={{
-          background: '#FFF0F6',
+          background: 'var(--color-kofi-blue)',
           padding: '15px 20px',
-          borderRadius: 12,
+          borderRadius: '9999px',
           marginBottom: 20,
-          border: '1px solid #FF80AB',
+          border: '2px solid var(--color-sticker-black)',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
         }}
       >
         <span style={{ fontSize: '20px' }}>⏱️</span>
-        <div style={{ fontSize: '14px', color: '#E91E63', fontWeight: 'bold' }}>
+        <div style={{ fontSize: '14px', color: 'var(--color-ink-black)', fontWeight: 'bold' }}>
           制限時間: {timeLimit} 分
         </div>
       </div>

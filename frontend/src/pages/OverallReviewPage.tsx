@@ -45,20 +45,20 @@ export function OverallReviewPage() {
 
       <div
         style={{
-          background: '#fff0f6',
+          background: 'var(--color-kofi-blue)',
           padding: 20,
-          borderRadius: 12,
+          borderRadius: '24px',
           margin: '20px 0',
-          border: '1px solid #FF80AB',
+          border: '2px solid var(--color-sticker-black)',
         }}
       >
-        <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', color: '#E91E63', fontSize: '15px' }}>
+        <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', color: 'var(--color-ink-black)', fontSize: '15px' }}>
           🔑 顧客の「真の課題」
         </p>
         {program.reveal_challenge && trueChallenge ? (
-          <p style={{ margin: 0, fontSize: 14, lineHeight: '1.6', color: '#333' }}>{trueChallenge}</p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: '1.6', color: 'var(--color-ink-black)' }}>{trueChallenge}</p>
         ) : (
-          <p className="small" style={{ margin: 0, color: '#666' }}>
+          <p className="small" style={{ margin: 0, color: 'var(--color-ink-black)' }}>
             全回完了後、先輩総評が完了すると真の課題が開示されます。
           </p>
         )}
@@ -66,19 +66,19 @@ export function OverallReviewPage() {
 
       <div
         style={{
-          background: '#f9f9f9',
+          background: 'var(--color-oat-cream)',
           padding: 20,
-          borderRadius: 12,
-          border: '1px solid #eee',
+          borderRadius: '24px',
+          border: '2px solid var(--color-sticker-black)',
           marginBottom: 20,
         }}
       >
         <h3
           style={{
             marginTop: 0,
-            borderBottom: '2px solid #E91E63',
+            borderBottom: '2px solid var(--color-sticker-black)',
             paddingBottom: '8px',
-            color: '#E91E63',
+            color: 'var(--color-ink-black)',
           }}
         >
           📝 先輩によるシリーズ総評
@@ -90,21 +90,21 @@ export function OverallReviewPage() {
               style={{
                 fontSize: 14,
                 lineHeight: 1.6,
-                color: '#333',
+                color: 'var(--color-ink-black)',
                 whiteSpace: 'pre-wrap',
                 marginBottom: 16,
                 paddingBottom: 16,
-                borderBottom: '1px solid #eee',
+                borderBottom: '1px solid var(--color-sticker-black)',
               }}
             >
-              <p className="small" style={{ fontWeight: 'bold', color: '#E91E63', margin: '0 0 8px' }}>
+              <p className="small" style={{ fontWeight: 'bold', color: 'var(--color-ink-black)', margin: '0 0 8px' }}>
                 {review.evaluator_id}
               </p>
               {review.content || '（評価内容なし）'}
             </div>
           ))
         ) : (
-          <p className="small" style={{ margin: 0, color: '#666' }}>
+          <p className="small" style={{ margin: 0, color: 'var(--color-ink-black)' }}>
             先輩総評はまだ届いていません。HULFT 経由で反映されるまでお待ちください。
           </p>
         )}
@@ -112,7 +112,7 @@ export function OverallReviewPage() {
 
       {program.customer_state?.session_summaries && program.customer_state.session_summaries.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <h3 style={{ borderBottom: '2px solid #E91E63', paddingBottom: 8, color: '#E91E63' }}>
+          <h3 style={{ borderBottom: '2px solid var(--color-sticker-black)', paddingBottom: 8, color: 'var(--color-ink-black)' }}>
             各回サマリ
           </h3>
           <ul style={{ paddingLeft: 20, margin: 0 }}>

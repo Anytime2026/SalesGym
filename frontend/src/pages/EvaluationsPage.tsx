@@ -125,13 +125,13 @@ export function EvaluationsPage() {
                 style={{
                   textDecoration: 'none',
                   display: 'block',
-                  border: isOverall ? '2px solid #E91E63' : '1px solid #eee',
-                  background: isOverall ? '#fff0f6' : '#fff',
+                  border: '2px solid var(--color-sticker-black)',
+                  background: isOverall ? 'var(--color-oat-cream)' : 'var(--color-paper-white)',
                   width: '100%',
                   margin: 0,
                   padding: '16px',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  borderRadius: '24px',
+                  boxShadow: 'none',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -139,7 +139,7 @@ export function EvaluationsPage() {
                     style={{
                       fontWeight: 'bold',
                       margin: '0 0 5px 0',
-                      color: isOverall ? '#E91E63' : '#1C75BC',
+                      color: 'var(--color-ink-black)',
                       fontSize: '15px',
                     }}
                   >
@@ -150,11 +150,12 @@ export function EvaluationsPage() {
                   {isOverall && (
                     <span
                       style={{
-                        background: '#E91E63',
-                        color: '#fff',
+                        background: 'var(--color-kofi-blue)',
+                        color: 'var(--color-ink-black)',
+                        border: '2px solid var(--color-sticker-black)',
                         fontSize: '10px',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
                         fontWeight: 'bold',
                       }}
                     >
@@ -181,7 +182,7 @@ export function EvaluationsPage() {
                     style={{
                       margin: 0,
                       fontWeight: 'bold',
-                      color: isOverall ? '#E91E63' : '#1C75BC',
+                      color: 'var(--color-ink-black)',
                     }}
                   >
                     {isOverall ? '全体総評を見る ＞' : '詳細評価 ＞'}

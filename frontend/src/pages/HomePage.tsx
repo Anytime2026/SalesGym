@@ -60,7 +60,7 @@ export function HomePage() {
 
   return (
     <div className="card" style={{ maxWidth: '500px' }}>
-      <h2 style={{ textAlign: 'center', color: '#E91E63', marginBottom: '8px' }}>営業ヒアリングロープレ</h2>
+      <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>営業ヒアリングロープレ</h2>
       <p className="small" style={{ textAlign: 'center', marginBottom: '24px' }}>
         AI顧客を相手にしたロールプレイトレーニング
       </p>
@@ -73,10 +73,10 @@ export function HomePage() {
 
       {!loading && activePrograms.length > 0 && (
         <div style={{ marginTop: '25px', marginBottom: '15px' }}>
-          <p className="small" style={{ fontWeight: 'bold', margin: '0 0 10px 0', color: '#E91E63' }}>
+          <p className="small" style={{ fontWeight: 'bold', margin: '0 0 10px 0', color: 'var(--color-ink-black)' }}>
             進行中のプログラム
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {activePrograms.map(({ registryId, industry, program }) => (
               <Link
                 key={registryId}
@@ -86,12 +86,12 @@ export function HomePage() {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  padding: '12px 18px',
+                  padding: '16px 20px',
                   margin: 0,
-                  background: '#FFF0F6',
-                  color: '#E91E63',
-                  border: '1px solid #FF80AB',
-                  borderRadius: '12px',
+                  background: 'var(--color-oat-cream)',
+                  color: 'var(--color-ink-black)',
+                  border: '2px solid var(--color-sticker-black)',
+                  borderRadius: '24px',
                 }}
                 onClick={() => setCurrentProgramId(registryId)}
               >
@@ -108,7 +108,7 @@ export function HomePage() {
         </div>
       )}
 
-      <Link to="/evaluations" className="btn primary" style={{ marginTop: '12px', background: '#FF5722' }}>
+      <Link to="/evaluations" className="btn primary" style={{ marginTop: '12px' }}>
         📊 評価履歴・総評一覧
       </Link>
 

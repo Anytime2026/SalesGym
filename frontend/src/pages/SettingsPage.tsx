@@ -84,8 +84,8 @@ export function SettingsPage() {
       </p>
 
       <div className="settings-grid">
-        <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '12px', border: '1px solid #eee' }}>
-          <h3 style={{ marginTop: 0, borderBottom: '2px solid #E91E63', paddingBottom: '8px' }}>1. 基本商談設定</h3>
+        <div style={{ background: 'var(--color-oat-cream)', padding: '20px', borderRadius: '24px', border: '2px solid var(--color-sticker-black)' }}>
+          <h3 style={{ marginTop: 0, borderBottom: '2px solid var(--color-sticker-black)', paddingBottom: '8px', color: 'var(--color-ink-black)' }}>1. 基本商談設定</h3>
 
           <label>業界</label>
           <select value={industry} onChange={(e) => handleIndustryChange(e.target.value as Industry)}>
@@ -142,8 +142,8 @@ export function SettingsPage() {
           </p>
         </div>
 
-        <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '12px', border: '1px solid #eee' }}>
-          <h3 style={{ marginTop: 0, borderBottom: '2px solid #E91E63', paddingBottom: '8px' }}>
+        <div style={{ background: 'var(--color-oat-cream)', padding: '20px', borderRadius: '24px', border: '2px solid var(--color-sticker-black)' }}>
+          <h3 style={{ marginTop: 0, borderBottom: '2px solid var(--color-sticker-black)', paddingBottom: '8px', color: 'var(--color-ink-black)' }}>
             2. AI顧客の人物設定 (任意)
           </h3>
 

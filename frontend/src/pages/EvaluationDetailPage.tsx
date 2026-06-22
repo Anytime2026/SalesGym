@@ -41,13 +41,13 @@ export function EvaluationDetailPage() {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginBottom: '15px',
-          borderBottom: '1px solid #eee',
+          marginBottom: '20px',
+          borderBottom: '2px solid var(--color-sticker-black)',
           paddingBottom: '10px',
         }}
       >
         <div>
-          <span style={{ fontWeight: 'bold', color: '#E91E63' }}>
+          <span style={{ fontWeight: 'bold', color: 'var(--color-ink-black)' }}>
             {industryLabel} - 第 {session.session_number} 回商談
           </span>
         </div>
@@ -59,15 +59,15 @@ export function EvaluationDetailPage() {
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <p style={{ fontWeight: 'bold', fontSize: '15px', color: '#E91E63', marginBottom: '10px' }}>
+        <p style={{ fontWeight: 'bold', fontSize: '15px', color: 'var(--color-ink-black)', marginBottom: '10px' }}>
           💬 会話履歴
         </p>
         <div
           style={{
-            background: '#fafafa',
+            background: 'var(--color-morning-fog)',
             padding: '15px',
-            borderRadius: '12px',
-            border: '1px solid #eee',
+            borderRadius: '24px',
+            border: '2px solid var(--color-sticker-black)',
             maxHeight: '260px',
             overflowY: 'auto',
             display: 'flex',
@@ -88,14 +88,14 @@ export function EvaluationDetailPage() {
                   style={{
                     alignSelf: isUser ? 'flex-end' : 'flex-start',
                     maxWidth: '85%',
-                    background: isUser ? '#E91E63' : '#fff',
-                    color: isUser ? '#fff' : '#333',
+                    background: isUser ? 'var(--color-kofi-blue)' : 'var(--color-paper-white)',
+                    color: 'var(--color-ink-black)',
                     padding: '10px 14px',
                     borderRadius: '12px',
                     borderBottomRightRadius: isUser ? '2px' : '12px',
                     borderBottomLeftRadius: isUser ? '12px' : '2px',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                    border: isUser ? 'none' : '1px solid #eee',
+                    boxShadow: 'none',
+                    border: '2px solid var(--color-sticker-black)',
                     fontSize: '13.5px',
                     lineHeight: '1.4',
                   }}
@@ -116,12 +116,12 @@ export function EvaluationDetailPage() {
       </div>
 
       {sessionSummary && (
-        <div style={{ borderTop: '1px solid #eee', paddingTop: 15, marginBottom: 20 }}>
+        <div style={{ borderTop: '2px solid var(--color-sticker-black)', paddingTop: 15, marginBottom: 20 }}>
           <h3
             style={{
               marginTop: 0,
-              color: '#E91E63',
-              borderBottom: '2px solid #E91E63',
+              color: 'var(--color-ink-black)',
+              borderBottom: '2px solid var(--color-sticker-black)',
               paddingBottom: '8px',
             }}
           >
@@ -130,26 +130,26 @@ export function EvaluationDetailPage() {
           <div
             className="msg ai"
             style={{
-              background: '#fff0f6',
-              border: '1px solid #FF80AB',
+              background: 'var(--color-oat-cream)',
+              border: '2px solid var(--color-sticker-black)',
               width: '100%',
               margin: 0,
               padding: 15,
-              borderRadius: 12,
+              borderRadius: '24px',
             }}
           >
-            <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.6', color: '#333' }}>{sessionSummary}</p>
+            <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.6', color: 'var(--color-ink-black)' }}>{sessionSummary}</p>
           </div>
         </div>
       )}
 
-      <div style={{ background: '#f3e5f5', padding: 20, borderRadius: 12, border: '1px solid #d1c4e9', marginBottom: 25 }}>
+      <div style={{ background: 'var(--color-oat-cream)', padding: 20, borderRadius: '24px', border: '2px solid var(--color-sticker-black)', marginBottom: 25 }}>
         <h3
           style={{
             marginTop: 0,
-            borderBottom: '2px solid #7b1fa2',
+            borderBottom: '2px solid var(--color-sticker-black)',
             paddingBottom: '8px',
-            color: '#7b1fa2',
+            color: 'var(--color-ink-black)',
           }}
         >
           📝 先輩からの評価
@@ -159,14 +159,14 @@ export function EvaluationDetailPage() {
             <div
               key={ev.id}
               style={{
-                background: '#fff',
+                background: 'var(--color-paper-white)',
                 padding: 14,
-                borderRadius: 10,
+                borderRadius: '16px',
                 marginBottom: 10,
-                border: '1px solid #e1bee7',
+                border: '2px solid var(--color-sticker-black)',
               }}
             >
-              <p className="small" style={{ margin: '0 0 6px', fontWeight: 'bold', color: '#7b1fa2' }}>
+              <p className="small" style={{ margin: '0 0 6px', fontWeight: 'bold', color: 'var(--color-ink-black)' }}>
                 {ev.evaluator_id}
               </p>
               <p style={{ margin: 0, fontSize: '13.5px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
@@ -175,7 +175,7 @@ export function EvaluationDetailPage() {
             </div>
           ))
         ) : (
-          <p className="small" style={{ margin: 0, color: '#4a148c' }}>
+          <p className="small" style={{ margin: 0, color: 'var(--color-ink-black)' }}>
             先輩評価はまだ届いていません。HULFT 経由で反映されるまでお待ちください。
           </p>
         )}

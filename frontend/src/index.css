@@ -1,9 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lilita+One&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
-  font-family: "Noto Sans JP", sans-serif;
+  /* Colors */
+  --color-oat-cream: #e9dfd2;
+  --color-morning-fog: #e5e7eb;
+  --color-ink-black: #202020;
+  --color-sticker-black: #000000;
+  --color-paper-white: #ffffff;
+  --color-kofi-blue: #aac9f7;
+  --color-cobalt-pop: #72a4f2;
+
+  /* Typography — Font Families */
+  --font-bogue-black: 'Lilita One', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
+  --font-dm-sans: 'DM Sans', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
+
+  /* Border Radius */
+  --radius-tags: 9999px;
+  --radius-cards: 40px;
+  --radius-inputs: 9999px;
+  --radius-buttons: 9999px;
+  --radius-feature-cards: 24px;
+  --radius-small-elements: 16px;
+
+  /* Surfaces */
+  --surface-canvas: var(--color-morning-fog);
+  --surface-oat-surface: var(--color-oat-cream);
+  --surface-paper-card: var(--color-paper-white);
+  --surface-blue-wash: var(--color-kofi-blue);
+
+  font-family: var(--font-dm-sans);
   line-height: 1.5;
-  color: #111;
+  color: var(--color-ink-black);
 }
 
 * {
@@ -13,10 +40,10 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1C75BC, #5CC0EF);
-  font-family: "Noto Sans JP", sans-serif;
+  background: var(--surface-canvas);
+  font-family: var(--font-dm-sans);
   line-height: 1.5;
-  color: #111;
+  color: var(--color-ink-black);
 }
 
 #root {
@@ -28,52 +55,98 @@ body {
   justify-content: center;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-bogue-black);
+  color: var(--color-ink-black);
+  margin-top: 0;
+  font-weight: 400; /* Lilita One looks best with regular weight */
+}
+
 /* 共通カード */
 .card {
-  background: #fff;
+  background: var(--surface-paper-card);
   width: 100%;
   max-width: 420px;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border-radius: var(--radius-cards);
+  padding: 28px;
+  border: 3px solid var(--color-sticker-black);
   margin: 20px;
+  box-shadow: none;
 }
 
 /* ボタン共通 */
 .btn {
   width: 100%;
-  padding: 14px;
+  padding: 14px 24px;
   margin: 10px 0;
-  border: none;
-  border-radius: 12px;
+  border: 2px solid var(--color-sticker-black);
+  border-radius: var(--radius-buttons);
   font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: 0.2s;
+  transition: 0.15s ease-in-out;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  font-family: var(--font-dm-sans);
 }
 
 .btn:hover {
-  transform: scale(1.02);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 /* 色定義 */
-.primary { background:#E91E63; color:#fff; }
-.secondary { background:#F06292; color:#fff; }
-.cta { background:#FF5722; color:#fff; font-weight:bold; }
+.primary {
+  background: var(--color-kofi-blue);
+  color: var(--color-ink-black);
+}
+.primary:hover {
+  background: var(--color-cobalt-pop);
+}
+
+.secondary {
+  background: var(--color-oat-cream);
+  color: var(--color-ink-black);
+}
+.secondary:hover {
+  background: #dbcdc0; /* slightly darker warm oat */
+}
+
+.cta {
+  background: var(--color-cobalt-pop);
+  color: var(--color-ink-black);
+}
+.cta:hover {
+  background: var(--color-kofi-blue);
+}
 
 /* 入力 */
 input, textarea, select {
   width: 100%;
-  padding: 10px;
+  padding: 12px 20px;
   margin: 8px 0 16px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  border-radius: var(--radius-inputs);
+  border: 2px solid var(--color-sticker-black);
+  background: var(--surface-paper-card);
   font-family: inherit;
+  color: inherit;
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea {
+  border-radius: var(--radius-feature-cards);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--color-cobalt-pop);
 }
 
 label {
@@ -81,11 +154,12 @@ label {
   font-weight: bold;
   display: block;
   margin-top: 10px;
+  color: var(--color-ink-black);
 }
 
 .small {
   font-size: 12px;
-  color: #666;
+  color: #555;
 }
 
 /* 入力グループ */
