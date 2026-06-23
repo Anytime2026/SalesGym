@@ -94,3 +94,29 @@ export const ACTIVE_PROGRAM_STATUSES = new Set([
   'all_sessions_done',
   'overall_review_requested',
 ])
+
+export async function uploadProgramMaterial(programId: string, file: File): Promise<Program> {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const res = await fetch(`${getApiBase()}/api/programs/${programId}/upload-material`, {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    let message = `HTTP ${res.status}`
+    try {
+      const parsed = JSON.parse(body)
+      if (parsed && typeof parsed.detail === 'string') {
+        message = parsed.detail
+      }
+    } catch {
+      if (body) message = body
+    }
+    throw new Error(message)
+  }
+
+  return res.json() as Promise<Program>
+}

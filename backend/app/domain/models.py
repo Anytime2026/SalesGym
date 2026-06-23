@@ -20,6 +20,8 @@ class Program(Base):
     status: Mapped[str] = mapped_column(String(32), default="created")
     evaluator_ids: Mapped[list] = mapped_column(JSON, default=list)
     profile_hints: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    materials_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    materials_filename: Mapped[str | None] = mapped_column(String(256), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     customer_profile: Mapped["CustomerProfile | None"] = relationship(back_populates="program", uselist=False)

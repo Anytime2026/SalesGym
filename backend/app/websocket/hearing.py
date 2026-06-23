@@ -82,8 +82,9 @@ async def hearing_websocket(websocket: WebSocket, session_id: UUID) -> None:
                         remaining = _remaining_seconds(session)  # type: ignore[arg-type]
 
                     profile_hints = program.profile_hints if program else None
+                    materials_text = program.materials_text if program else None
                     system = pipeline.build_system_prompt(
-                        profile, state, session.goal, remaining, profile_hints  # type: ignore[arg-type]
+                        profile, state, session.goal, remaining, profile_hints, materials_text  # type: ignore[arg-type]
                     )
 
                     try:

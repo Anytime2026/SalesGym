@@ -25,6 +25,9 @@ CHAT_SYSTEM_TEMPLATE = """あなたはB2B商談の見込み顧客としてロー
 真の課題を直接明かさないでください。気づき度が低いほど課題認識は曖昧に。
 残り時間が少ない場合は会話を締めに向かうが、相手が締め中なら協調的に続けてください。
 
+【参考資料について】
+提供されている「参考資料（事前インプット）」がある場合、これは営業担当から事前に送付された製品仕様や営業資料等の参考情報です。あなたは既にこの内容を把握している前提でロールプレイを行ってください。営業担当から「送った資料」「添付ファイル」「事前テキスト」などの言及があった場合は、この参考資料を指していると理解し、その内容に沿って受け答えをしてください。
+{materials_section}
 【顧客プロファイル】
 {profile_json}
 
@@ -37,6 +40,7 @@ CHAT_SYSTEM_TEMPLATE = """あなたはB2B商談の見込み顧客としてロー
 【残り秒数】
 {remaining_sec}
 """
+
 
 
 class AudioPipeline:
@@ -53,6 +57,7 @@ class AudioPipeline:
         goal: str,
         remaining_sec: int,
         profile_hints: dict | None = None,
+        materials_text: str | None = None,
     ) -> str:
         profile_data: dict = {
             "industry": profile.industry,
@@ -73,7 +78,12 @@ class AudioPipeline:
             },
             ensure_ascii=False,
         )
+        materials_section = ""
+        if materials_text:
+            materials_section = f"\n【参考資料（事前インプット）】\n{materials_text}\n"
+
         return CHAT_SYSTEM_TEMPLATE.format(
+            materials_section=materials_section,
             profile_json=profile_json,
             state_json=state_json,
             goal=goal,

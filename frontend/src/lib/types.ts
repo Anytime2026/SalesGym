@@ -46,6 +46,7 @@ export type Program = {
   created_at: string
   reveal_challenge: boolean
   completed_sessions: number
+  materials_filename?: string | null
   customer_profile?: CustomerProfile | null
   customer_state?: CustomerState | null
   sessions?: SessionListItem[]

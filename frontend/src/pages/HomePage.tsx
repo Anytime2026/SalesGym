@@ -68,7 +68,7 @@ export function HomePage() {
       </p>
 
       <Link to="/settings" className="btn primary" style={{ padding: '16px' }}>
-        ▶ 新規プログラム作成
+        ▶ 新規商談作成
       </Link>
 
       {loading && <p className="small" style={{ marginTop: 16 }}>読み込み中…</p>}
