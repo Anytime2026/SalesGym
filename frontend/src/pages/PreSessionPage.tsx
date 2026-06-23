@@ -122,8 +122,13 @@ export function PreSessionPage() {
         {profile ? (
           <>
             <p style={{ fontWeight: 'bold', fontSize: '18px', margin: '5px 0' }}>
-              {profile.role_title}
+              {profile.name ? `${profile.name} 様` : profile.role_title}
             </p>
+            {profile.name && (
+              <p className="small" style={{ margin: '0 0 4px 0', opacity: 0.9 }}>
+                {profile.role_title}
+              </p>
+            )}
             <p className="small" style={{ margin: 0, opacity: 0.9 }}>
               {profile.industry} / {profile.company_size} (分野: {subIndustry || program.field})
             </p>
