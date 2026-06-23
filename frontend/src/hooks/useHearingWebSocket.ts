@@ -84,9 +84,7 @@ export function useHearingWebSocket({
     ws.onmessage = async (event) => {
       if (event.data instanceof ArrayBuffer) {
         if (event.data.byteLength > 0) {
-          await scheduleAudio(
-            new Blob([event.data], { type: 'audio/mpeg' }),
-          )
+          await scheduleAudio(new Blob([event.data], { type: 'audio/mpeg' }))
         }
         return
       }

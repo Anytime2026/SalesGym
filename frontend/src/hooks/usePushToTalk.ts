@@ -78,11 +78,7 @@ export function usePushToTalk({ onChunk, disabled }: UsePushToTalkOptions) {
 
     processor.onaudioprocess = (event) => {
       const input = event.inputBuffer.getChannelData(0)
-      const downsampled = downsampleBuffer(
-        input,
-        inputRate,
-        TARGET_SAMPLE_RATE,
-      )
+      const downsampled = downsampleBuffer(input, inputRate, TARGET_SAMPLE_RATE)
       pendingRef.current.push(downsampled)
       sampleCountRef.current += downsampled.length
 
