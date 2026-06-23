@@ -15,10 +15,11 @@ class Program(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[str] = mapped_column(String(128), default="default-user")
-    field: Mapped[str] = mapped_column(String(64))
+    field: Mapped[str] = mapped_column(String(256))
     total_sessions: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(32), default="created")
     evaluator_ids: Mapped[list] = mapped_column(JSON, default=list)
+    profile_hints: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     customer_profile: Mapped["CustomerProfile | None"] = relationship(back_populates="program", uselist=False)
@@ -32,6 +33,7 @@ class CustomerProfile(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     program_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("programs.id"), unique=True)
+    name: Mapped[str] = mapped_column(String(64), default="")
     industry: Mapped[str] = mapped_column(Text)
     company_size: Mapped[str] = mapped_column(Text)
     role_title: Mapped[str] = mapped_column(Text)

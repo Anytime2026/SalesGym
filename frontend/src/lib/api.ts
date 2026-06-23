@@ -1,21 +1,27 @@
-import type { HearingSession, Program } from './types'
+import type {
+  CreateProgramInput,
+  HearingSession,
+  Program,
+  SessionListItem,
+} from './types'
 
-/** 開発時は Vite プロキシ経由（同一オリジン）で CORS を回避 */
+/** 開発時・Cloudflare Pages 本番は同一オリジン（Vite / Pages Functions プロキシ） */
 export function getApiBase(): string {
-  if (import.meta.env.DEV) return ''
-  return (import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '')
+  const base = import.meta.env.VITE_API_BASE_URL
+  if (import.meta.env.DEV || !base) return ''
+  return base.replace(/\/$/, '')
 }
 
 export function getWsBase(): string {
   const explicit = import.meta.env.VITE_WS_BASE_URL
   if (explicit) return explicit.replace(/\/$/, '')
 
-  if (import.meta.env.DEV) {
+  const api = import.meta.env.VITE_API_BASE_URL
+  if (!api || import.meta.env.DEV) {
     const { protocol, host } = window.location
     return `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}`
   }
 
-  const api = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
   if (api.startsWith('https://')) return `wss://${api.slice('https://'.length)}`
   if (api.startsWith('http://')) return `ws://${api.slice('http://'.length)}`
   return api
@@ -33,15 +39,19 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>
 }
 
-export function createProgram(field: string, totalSessions: number): Promise<Program> {
+export function createProgram(input: CreateProgramInput): Promise<Program> {
   return request<Program>('/api/programs', {
     method: 'POST',
-    body: JSON.stringify({ field, total_sessions: totalSessions }),
+    body: JSON.stringify(input),
   })
 }
 
 export function getProgram(programId: string): Promise<Program> {
   return request<Program>(`/api/programs/${programId}`)
+}
+
+export function listSessions(programId: string): Promise<SessionListItem[]> {
+  return request<SessionListItem[]>(`/api/programs/${programId}/sessions`)
 }
 
 export function createSession(
@@ -56,15 +66,21 @@ export function createSession(
 }
 
 export function startSession(sessionId: string): Promise<HearingSession> {
-  return request<HearingSession>(`/api/sessions/${sessionId}/start`, { method: 'POST' })
+  return request<HearingSession>(`/api/sessions/${sessionId}/start`, {
+    method: 'POST',
+  })
 }
 
 export function endSession(sessionId: string): Promise<HearingSession> {
-  return request<HearingSession>(`/api/sessions/${sessionId}/end`, { method: 'POST' })
+  return request<HearingSession>(`/api/sessions/${sessionId}/end`, {
+    method: 'POST',
+  })
 }
 
 export function abortSession(sessionId: string): Promise<HearingSession> {
-  return request<HearingSession>(`/api/sessions/${sessionId}/abort`, { method: 'POST' })
+  return request<HearingSession>(`/api/sessions/${sessionId}/abort`, {
+    method: 'POST',
+  })
 }
 
 export function getSession(sessionId: string): Promise<HearingSession> {
@@ -74,3 +90,18 @@ export function getSession(sessionId: string): Promise<HearingSession> {
 export function getWsUrl(sessionId: string): string {
   return `${getWsBase()}/ws/sessions/${sessionId}/hearing`
 }
+
+/** 評価一覧に表示するセッション status */
+export const EVALUABLE_SESSION_STATUSES = new Set([
+  'evaluation_requested',
+  'evaluated',
+  'completed',
+])
+
+/** 進行中とみなす program status */
+export const ACTIVE_PROGRAM_STATUSES = new Set([
+  'created',
+  'in_progress',
+  'all_sessions_done',
+  'overall_review_requested',
+])

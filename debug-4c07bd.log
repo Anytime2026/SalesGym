@@ -16,3 +16,5 @@
 {"sessionId": "4c07bd", "location": "hearing.py:process_turn", "message": "pipeline ok", "data": {"user_text_len": 41, "ai_text_len": 55, "audio_out_len": 4076}, "timestamp": 1781872004053, "hypothesisId": "B", "runId": "pre-fix"}
 {"sessionId": "4c07bd", "location": "hearing.py:ptt_end", "message": "ptt_end received", "data": {"buffer_len": 83790, "media_format": "webm"}, "timestamp": 1781872021108, "hypothesisId": "A", "runId": "pre-fix"}
 {"sessionId": "4c07bd", "location": "hearing.py:process_turn", "message": "pipeline ok", "data": {"user_text_len": 41, "ai_text_len": 55, "audio_out_len": 4076}, "timestamp": 1781872021330, "hypothesisId": "B", "runId": "pre-fix"}
+{"sessionId": "4c07bd", "location": "hearing.py:ptt_end", "message": "ptt_end received", "data": {"buffer_len": 0, "media_format": "webm"}, "timestamp": 1782191611666, "hypothesisId": "A", "runId": "pre-fix"}
+{"sessionId": "4c07bd", "location": "hearing.py:ptt_end", "message": "empty audio buffer", "data": {}, "timestamp": 1782191611678, "hypothesisId": "A", "runId": "pre-fix"}
