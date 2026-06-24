@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { createSession, getProgram, startSession } from '../lib/api'
 import { findRegistryEntry, getCurrentProgramId } from '../lib/registry'
 import type { Program } from '../lib/types'
@@ -58,7 +59,8 @@ export function PreSessionPage() {
     }
   }
 
-  if (loading) return <div className="card">読み込み中…</div>
+  if (loading) return <LoadingScreen message="準備中" />
+  if (starting) return <LoadingScreen message="セッションを開始しています" />
   if (!program) return <div className="card">プログラムが見つかりません</div>
 
   if (program.completed_sessions >= program.total_sessions) {

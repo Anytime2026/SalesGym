@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ControlBar } from '../components/roleplay/ControlBar'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { MeetingShell } from '../components/roleplay/MeetingShell'
 import { ParticipantTile } from '../components/roleplay/ParticipantTile'
 import { TranscriptDrawer } from '../components/roleplay/TranscriptDrawer'
@@ -125,11 +126,7 @@ export function RoleplayMeetingPage() {
   const customerRole = program?.customer_profile?.role_title ?? '見込み顧客'
 
   if (!session) {
-    return (
-      <div className="meeting-shell">
-        <div className="meeting-complete">セッションを読み込み中…</div>
-      </div>
-    )
+    return <LoadingScreen message="セッションを読み込み中" />
   }
 
   if (ended) {

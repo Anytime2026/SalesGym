@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { getProgram, getSession } from '../lib/api'
 import { findRegistryEntry } from '../lib/registry'
 import type { HearingSession, Program } from '../lib/types'
@@ -24,7 +25,7 @@ export function EvaluationDetailPage() {
       .finally(() => setLoading(false))
   }, [id])
 
-  if (loading) return <div className="card">読み込み中…</div>
+  if (loading) return <LoadingScreen message="評価を読み込み中" />
   if (error || !session || !program)
     return <div className="card">{error ?? 'データがありません'}</div>
 

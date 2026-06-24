@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { getReviewPage, submitSessionEvaluation } from '../lib/api'
 import type { ReviewPageData } from '../lib/types'
 
@@ -52,7 +53,7 @@ export function ReviewerEvaluationPage() {
     }
   }
 
-  if (loading) return <div className="card">読み込み中…</div>
+  if (loading) return <LoadingScreen message="評価ページを読み込み中" />
   if (error || !page)
     return <div className="card">{error ?? 'ページが見つかりません'}</div>
 

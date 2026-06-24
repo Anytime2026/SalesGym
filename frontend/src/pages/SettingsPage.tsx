@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { createProgram } from '../lib/api'
 import { addRegistryEntry, setCurrentProgramId } from '../lib/registry'
 import { INDUSTRY_META } from '../types'
@@ -108,6 +109,16 @@ export function SettingsPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <LoadingScreen
+        character="thinking"
+        message="AI顧客のペルソナを作成しています"
+        hint="業界・分野・性格設定に合わせてロープレ相手を準備しています。数十秒かかることがあります。"
+      />
+    )
   }
 
   return (
@@ -268,7 +279,7 @@ export function SettingsPage() {
           disabled={loading}
           style={{ flex: 2, margin: 0 }}
         >
-          {loading ? '作成中…' : '▶ プログラム作成'}
+          ▶ プログラム作成
         </button>
       </div>
     </div>

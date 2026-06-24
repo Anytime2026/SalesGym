@@ -44,3 +44,17 @@ cd frontend
 npm.cmd install
 npm.cmd run dev
 ```
+
+## CI（GitHub Actions）
+
+`main` / `master` 向け PR では **Prettier + ESLint** が走る（`npm ci` 使用）。
+
+PR 前にローカルで確認:
+
+```bash
+cd frontend
+npm ci
+npm run ci
+```
+
+詳細: [`docs/20260624-ci-pass-procedure.md`](../docs/20260624-ci-pass-procedure.md)

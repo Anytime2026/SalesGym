@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { EVALUABLE_SESSION_STATUSES, getProgram } from '../lib/api'
 import { loadRegistry } from '../lib/registry'
 import { INDUSTRY_META } from '../types'
@@ -103,7 +104,9 @@ export function EvaluationsPage() {
         これまでの個別セッションおよびシリーズ総評一覧
       </p>
 
-      {loading && <p className="small">読み込み中…</p>}
+      {loading && (
+        <LoadingScreen variant="inline" showLogo={false} message="読み込み中" />
+      )}
 
       {!loading && items.length === 0 && (
         <p className="small">完了したセッションや商談はまだありません</p>

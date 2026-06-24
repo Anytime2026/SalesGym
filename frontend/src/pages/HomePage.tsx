@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { ACTIVE_PROGRAM_STATUSES, getProgram } from '../lib/api'
 import {
   clearLocalData,
@@ -83,9 +84,7 @@ export function HomePage() {
       </Link>
 
       {loading && (
-        <p className="small" style={{ marginTop: 16 }}>
-          読み込み中…
-        </p>
+        <LoadingScreen variant="inline" showLogo={false} message="読み込み中" />
       )}
 
       {!loading && activePrograms.length > 0 && (

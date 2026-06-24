@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { getProgram } from '../lib/api'
 import { findRegistryEntry, getCurrentProgramId } from '../lib/registry'
 import type { Program } from '../lib/types'
@@ -25,7 +26,7 @@ export function OverallReviewPage() {
       .finally(() => setLoading(false))
   }, [searchParams])
 
-  if (loading) return <div className="card">読み込み中…</div>
+  if (loading) return <LoadingScreen message="総評を読み込み中" />
   if (error || !program)
     return <div className="card">{error ?? 'データがありません'}</div>
 
