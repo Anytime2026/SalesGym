@@ -20,6 +20,8 @@ from app.services.prompts import PROFILE_SYSTEM, split_profile_data
 
 logger = logging.getLogger(__name__)
 
+_PROFILE_MAX_TOKENS = (1536, 2048, 2048)
+
 
 def _parse_llm_json(raw: str) -> dict:
     import json
@@ -94,19 +96,30 @@ class ProgramService:
         if sub_field:
             user_prompt += f"\nセクター（詳細分野）: {sub_field}"
         last_error: json.JSONDecodeError | None = None
-        for attempt in range(3):
+        prompt = user_prompt
+        for attempt, max_tokens in enumerate(_PROFILE_MAX_TOKENS, start=1):
             raw = self.bedrock.invoke(
                 settings.bedrock_analysis_model_id,
                 PROFILE_SYSTEM,
-                user_prompt,
-                max_tokens=800,
+                prompt,
+                max_tokens=max_tokens,
             )
             try:
                 return _parse_llm_json(raw)
             except json.JSONDecodeError as exc:
                 last_error = exc
-                logger.warning("Profile JSON parse failed (attempt %d): %s", attempt + 1, exc)
-        raise last_error  # type: ignore[misc]
+                logger.warning(
+                    "Profile JSON parse failed (attempt %d, max_tokens=%d): %s",
+                    attempt,
+                    max_tokens,
+                    exc,
+                )
+                prompt = (
+                    f"{user_prompt}\n\n"
+                    "【重要】前回の出力はJSONとして不完全でした。"
+                    "各文字列は指定字数以内に収め、閉じたJSONオブジェクト1つのみを返してください。"
+                )
+        raise ValueError("customer profile JSON could not be parsed") from last_error
 
     async def get_program(self, program_id: UUID) -> Program | None:
         result = await self.db.execute(

@@ -130,9 +130,27 @@ def test_sanitize_customer_speech_removes_expression_stage_direction() -> None:
     assert sanitize_customer_speech(raw) == "...すみません、ちょっと聞き取りにくかったんですが、"
 
 
-def test_sanitize_customer_speech_keeps_product_name_in_parens() -> None:
+def test_sanitize_customer_speech_removes_product_name_parens() -> None:
     raw = "御社のサービス（コマツマナト）について教えてください。"
-    assert sanitize_customer_speech(raw) == raw
+    assert sanitize_customer_speech(raw) == "御社のサービスについて教えてください。"
+
+
+def test_sanitize_customer_speech_removes_generic_parenthetical() -> None:
+    raw = "（少し驚いて）え、そうなんですか。"
+    assert sanitize_customer_speech(raw) == "え、そうなんですか。"
+
+
+def test_build_system_prompt_speech_only_rules() -> None:
+    prompt = build_chat_system_prompt(
+        _make_profile(),
+        _make_state(),
+        goal="初回ヒアリング",
+        remaining_sec=600,
+        session_number=1,
+    )
+    assert "出力形式（最重要" in prompt
+    assert "TTS" in prompt
+    assert "括弧" in prompt
 
 
 def test_split_profile_data() -> None:

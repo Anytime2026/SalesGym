@@ -4,14 +4,8 @@ from __future__ import annotations
 
 import re
 
-# 先頭の括弧書き（舞台指示・ト書き）を除去
-_LEADING_ASIDE = re.compile(r"^[\s　]*[（(][^（）()]*[）)]")
-# 文中の舞台指示とみなすキーワード
-_STAGE_DIRECTION_KEYWORDS = re.compile(
-    r"しながら|ため息|仕草|間を置|頷|会釈|笑い?|沈黙|考え込|深呼吸|メモを|うーん|一声|"
-    r"そう言って|ふうっ|姿勢|視線|表情|変えず|小声|独り言|小声で|一呼吸|軽く"
-)
-_INLINE_ASIDE = re.compile(r"[（(]([^（）()]*)[）)]")
+# TTS 向け: 全角・半角の括弧・角括弧ブロックを除去（舞台指示・補足説明ともに読み上げ対象外）
+_PAREN_BLOCK = re.compile(r"[（(\[［][^（）()\]］]*[）)\]］]")
 PROFILE_SYSTEM = """あなたはB2Bディスカバリー商談のロープレ用・見込み顧客ペルソナを設計する専門家です。
 指定分野の現実的な日本企業の決裁者・担当者像を1名分、JSONオブジェクト1つのみで返してください。
 説明文・マークダウン・コードブロックは禁止。
@@ -25,7 +19,7 @@ PROFILE_SYSTEM = """あなたはB2Bディスカバリー商談のロープレ用
 - initial_awareness: 0-100（真の課題への自覚度）
 - hidden_motivations: 真の課題に関わるが表に出しにくい動機（配列2-3件）
 - typical_objections: 営業に対する典型的な懸念・反論（配列2-3件）
-- background_facts: 商談で自然に語れる背景事実（配列3-5件。部署・予算・体制・直近の出来事など）
+- background_facts: 商談で自然に語れる背景事実（配列2-3件・各60字以内。部署・予算・体制・直近の出来事など）
 - communication_style: 話し方（例: 「丁寧語だが距離感あり。専門用語は避け、具体例を求める」）
 
 ## 設計ルール
@@ -69,21 +63,27 @@ CHAT_SYSTEM_TEMPLATE = """# 役割
 - 残り時間: 約{remaining_sec}秒
 {time_pressure_section}
 
+# 出力形式（最重要・厳守）
+応答はそのまま音声合成（TTS）で読み上げられる。口に出すセリフだけを書く。
+- 括弧（）、()、［］、[] で囲んだ文は一切書かない（動作・表情・間・心の声・補足説明すべて禁止）
+- ト書き・舞台指示・ナレーション・地の文は禁止
+- 悪い例: 「（少し考えて）なるほどですね」「（ため息）そうですね…」
+- 良い例: 「なるほどですね」「そうですね…ちょっと難しいところですが」
+- 製品名や略称も括弧で補足せず、そのまま口に出す（例: 「コマツマナト、ですか」）
+
 # 応答ルール
 1. 一人称で、{name}として話す。営業担当を「御社」「あなた」等で呼ぶ
-2. 1ターン40〜120字程度。音声読み上げ向けに短い文・口語で
-3. 発話テキストのみ出力する。ト書き・舞台指示・動作描写は一切書かない
-4. 括弧（）や（）で囲んだ説明・描写は禁止（例: 禁止「（少し間を置いて）コマツマナトですか」→ 正「コマツマナト、ですか」）
-5. 営業の質問に答える。逆質問は1つまで、自然な範囲で
-6. ラポールが低い: 警戒・短答・具体性を出さない
-7. ラポールが高い: 背景や本音の端を少し見せる（ただし真の課題の直球開示は awareness に従う）
-8. 営業が押し売り・専門用語の羅列・話を遮った場合は、性格に沿って距離を置く
-9. 知らないことは「社内確認が必要」「詳細は担当に任せている」と正直に
-10. 前のターンで言った内容と矛盾しない
+2. 1ターン40〜120字程度。短い文・口語で、電話や対面商談の会話調
+3. 営業の質問に答える。逆質問は1つまで、自然な範囲で
+4. ラポールが低い: 警戒・短答・具体性を出さない
+5. ラポールが高い: 背景や本音の端を少し見せる（ただし真の課題の直球開示は awareness に従う）
+6. 営業が押し売り・専門用語の羅列・話を遮った場合は、性格に沿って距離を置く
+7. 知らないことは「社内確認が必要」「詳細は担当に任せている」と正直に
+8. 前のターンで言った内容と矛盾しない
 
 # 禁止
 - 箇条書き・Markdown・メタ発言（「役として」「ロープレでは」等）
-- 括弧書きの舞台指示（（ため息）（間を置いて）(pause) 等）
+- 括弧を使ったあらゆる非発話テキスト（（間を置いて）、(pause)、［小声で］ 等）
 - 営業への助言、ロープレの解説、AIであることの言及
 - 真の課題の直接開示（awareness が80未満では特に厳守）
 - 営業が締めに入っているのに新しい論点を振る（残り時間が少ない場合）
@@ -134,23 +134,13 @@ MAX_CONVERSATION_TURNS = 20
 
 
 def sanitize_customer_speech(text: str) -> str:
-    """Remove stage directions and parenthetical asides before TTS / transcript display."""
+    """Strip non-spoken parenthetical text before TTS and transcript display."""
     cleaned = text.strip()
-    # 応答先頭の括弧ブロックは舞台指示とみなし、キーワード不要で除去
-    while True:
-        match = _LEADING_ASIDE.match(cleaned)
-        if not match:
-            break
-        cleaned = cleaned[match.end() :].lstrip()
-
-    def _replace_inline(match: re.Match[str]) -> str:
-        inner = match.group(1)
-        if _STAGE_DIRECTION_KEYWORDS.search(inner):
-            return ""
-        return match.group(0)
-
-    cleaned = _INLINE_ASIDE.sub(_replace_inline, cleaned)
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    prev = None
+    while prev != cleaned:
+        prev = cleaned
+        cleaned = _PAREN_BLOCK.sub("", cleaned)
+        cleaned = re.sub(r"[\s　]+", " ", cleaned).strip()
     return cleaned
 
 
