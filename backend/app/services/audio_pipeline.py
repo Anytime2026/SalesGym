@@ -84,6 +84,7 @@ class AudioPipeline:
             remaining_sec,
             session_number,
             profile_hints,
+            materials_text,
         )
 
     async def transcribe_turn(self, audio_bytes: bytes, media_format: str = "webm") -> str:

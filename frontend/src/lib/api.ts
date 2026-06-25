@@ -32,6 +32,27 @@ export function getWsBase(): string {
   return api
 }
 
+/** FastAPI のエラーレスポンスから表示用メッセージを抽出 */
+export function parseApiErrorMessage(body: string, status?: number): string {
+  if (!body) return status ? `HTTP ${status}` : 'リクエストに失敗しました'
+  try {
+    const parsed = JSON.parse(body) as { detail?: unknown }
+    if (typeof parsed.detail === 'string') return parsed.detail
+    if (Array.isArray(parsed.detail)) {
+      return parsed.detail
+        .map((item) =>
+          typeof item === 'object' && item && 'msg' in item
+            ? String((item as { msg: unknown }).msg)
+            : String(item),
+        )
+        .join(', ')
+    }
+  } catch {
+    /* plain text */
+  }
+  return body
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${getApiBase()}${path}`, {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -39,7 +60,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const body = await res.text()
-    throw new Error(body || `HTTP ${res.status}`)
+    throw new Error(parseApiErrorMessage(body, res.status))
   }
   return res.json() as Promise<T>
 }
@@ -158,16 +179,7 @@ export async function uploadProgramMaterial(
 
   if (!res.ok) {
     const body = await res.text()
-    let message = `HTTP ${res.status}`
-    try {
-      const parsed = JSON.parse(body)
-      if (parsed && typeof parsed.detail === 'string') {
-        message = parsed.detail
-      }
-    } catch {
-      if (body) message = body
-    }
-    throw new Error(message)
+    throw new Error(parseApiErrorMessage(body, res.status))
   }
 
   return res.json() as Promise<Program>

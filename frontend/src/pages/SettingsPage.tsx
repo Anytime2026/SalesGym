@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createProgram, uploadProgramMaterial } from '../lib/api'
+import { createProgram } from '../lib/api'
 import { addRegistryEntry, setCurrentProgramId } from '../lib/registry'
 import { INDUSTRY_META } from '../types'
 import type { Industry } from '../types'
@@ -61,7 +61,6 @@ export function SettingsPage() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [materialFile, setMaterialFile] = useState<File | null>(null)
 
   const handleIndustryChange = (newIndustry: Industry) => {
     setIndustry(newIndustry)
@@ -93,10 +92,6 @@ export function SettingsPage() {
         personality_type: personalityType.trim() || undefined,
         it_knowledge_level: customerItLevel.trim() || undefined,
       })
-
-      if (materialFile) {
-        await uploadProgramMaterial(program.id, materialFile)
-      }
 
       addRegistryEntry({
         id: program.id,
@@ -249,52 +244,6 @@ export function SettingsPage() {
             onChange={(e) => setPersonalityType(e.target.value)}
             rows={4}
             style={{ margin: '5px 0 10px', fontSize: '13px' }}
-          />
-
-          <h3
-            style={{
-              marginTop: '20px',
-              borderBottom: '2px solid var(--color-sticker-black)',
-              paddingBottom: '8px',
-              color: 'var(--color-ink-black)',
-            }}
-          >
-            3. 参考資料の添付 (任意)
-          </h3>
-          <p
-            className="small"
-            style={{ marginBottom: '10px', color: 'var(--color-ink-gray)' }}
-          >
-            商談でAI顧客に参照させたい製品概要や営業資料（PDF, TXT,
-            MD）を添付できます。※最大10MB
-          </p>
-          <input
-            type="file"
-            accept=".pdf,.txt,.md"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null
-              if (file) {
-                if (file.size > 10 * 1024 * 1024) {
-                  setError('ファイルサイズは10MB以下にしてください。')
-                  setMaterialFile(null)
-                  e.target.value = ''
-                } else {
-                  setError(null)
-                  setMaterialFile(file)
-                }
-              } else {
-                setMaterialFile(null)
-              }
-            }}
-            style={{
-              fontSize: '13px',
-              padding: '8px',
-              background: '#fff',
-              border: '2px solid var(--color-sticker-black)',
-              borderRadius: '8px',
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
           />
         </div>
       </div>
