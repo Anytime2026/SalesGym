@@ -124,8 +124,12 @@ export function PreSessionPage() {
         illustration="/images/LevelUp.svg"
       >
         <PageSection variant="blue">
-          <p className="profile-name" style={{ fontSize: 'var(--text-headline)' }}>
-            設定された商談回数（全 {program.total_sessions} 回）をすべて実施済みです
+          <p
+            className="profile-name"
+            style={{ fontSize: 'var(--text-headline)' }}
+          >
+            設定された商談回数（全 {program.total_sessions}{' '}
+            回）をすべて実施済みです
           </p>
           <p className="small" style={{ margin: 0 }}>
             新しいセッションを開始することはできません。評価履歴や総評を確認してください。
@@ -133,7 +137,11 @@ export function PreSessionPage() {
         </PageSection>
 
         <PageActions>
-          <Button variant="gray" className="btn--shrink" onClick={() => navigate('/')}>
+          <Button
+            variant="gray"
+            className="btn--shrink"
+            onClick={() => navigate('/')}
+          >
             ホームに戻る
           </Button>
           <Button
@@ -219,11 +227,18 @@ export function PreSessionPage() {
             <p className="page-section__label">前回までの経緯</p>
             {priorSummaries.length > 0 && (
               <div style={{ marginBottom: disclosedInfo.length > 0 ? 12 : 0 }}>
-                <p className="small" style={{ margin: '0 0 8px', fontWeight: 600 }}>
+                <p
+                  className="small"
+                  style={{ margin: '0 0 8px', fontWeight: 600 }}
+                >
                   各回サマリ
                 </p>
                 {priorSummaries.map((s) => (
-                  <p key={s.session_number} className="small" style={{ margin: '0 0 6px' }}>
+                  <p
+                    key={s.session_number}
+                    className="small"
+                    style={{ margin: '0 0 6px' }}
+                  >
                     第 {s.session_number} 回: {s.summary}
                   </p>
                 ))}
@@ -231,7 +246,10 @@ export function PreSessionPage() {
             )}
             {disclosedInfo.length > 0 && (
               <div>
-                <p className="small" style={{ margin: '0 0 8px', fontWeight: 600 }}>
+                <p
+                  className="small"
+                  style={{ margin: '0 0 8px', fontWeight: 600 }}
+                >
                   開示済み情報
                 </p>
                 <ul className="summary-list">
@@ -255,7 +273,8 @@ export function PreSessionPage() {
       <PageSection variant="paper">
         <p className="page-section__label">参考資料の添付（任意）</p>
         <p className="small" style={{ margin: '0 0 12px' }}>
-          商談でAI顧客に見せる製品概要や営業資料（PDF, TXT, MD）を添付できます。最大10MB。
+          商談でAI顧客に見せる製品概要や営業資料（PDF, TXT,
+          MD）を添付できます。最大10MB。
         </p>
         {program.materials_filename && !materialFile && (
           <p className="small" style={{ marginBottom: 12 }}>
@@ -304,7 +323,11 @@ export function PreSessionPage() {
       )}
 
       <PageActions>
-        <Button variant="gray" className="btn--shrink" onClick={() => navigate('/')}>
+        <Button
+          variant="gray"
+          className="btn--shrink"
+          onClick={() => navigate('/')}
+        >
           戻る
         </Button>
         <Button

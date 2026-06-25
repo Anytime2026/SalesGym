@@ -1,4 +1,9 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import type {
+  InputHTMLAttributes,
+  ReactNode,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'react'
 import './Form.css'
 
 type FormFieldProps = {
@@ -9,7 +14,13 @@ type FormFieldProps = {
   className?: string
 }
 
-export function FormField({ label, hint, error, children, className = '' }: FormFieldProps) {
+export function FormField({
+  label,
+  hint,
+  error,
+  children,
+  className = '',
+}: FormFieldProps) {
   return (
     <div className={`form-field ${className}`.trim()}>
       <label className="form-field__label">{label}</label>
@@ -34,7 +45,12 @@ type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
   hint?: string
 }
 
-export function SelectField({ label, hint, children, ...props }: SelectFieldProps) {
+export function SelectField({
+  label,
+  hint,
+  children,
+  ...props
+}: SelectFieldProps) {
   return (
     <FormField label={label} hint={hint}>
       <select {...props}>{children}</select>

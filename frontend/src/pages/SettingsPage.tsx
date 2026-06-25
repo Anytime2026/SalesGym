@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { PageActions, PageSection, PageShell } from '../components/PageShell'
 import { Button } from '../components/ui/Button'
-import {
-  InputField,
-  SelectField,
-  TextAreaField,
-} from '../components/ui/Form'
+import { InputField, SelectField, TextAreaField } from '../components/ui/Form'
 import { useDeferredLoading } from '../hooks/useDeferredLoading'
 import { createProgram } from '../lib/api'
 import { addRegistryEntry, setCurrentProgramId } from '../lib/registry'
@@ -234,14 +230,14 @@ export function SettingsPage() {
       )}
 
       <PageActions>
-        <Button variant="gray" className="btn--shrink" onClick={() => navigate('/')}>
+        <Button
+          variant="gray"
+          className="btn--shrink"
+          onClick={() => navigate('/')}
+        >
           戻る
         </Button>
-        <Button
-          className="btn--grow"
-          onClick={handleCreate}
-          disabled={loading}
-        >
+        <Button className="btn--grow" onClick={handleCreate} disabled={loading}>
           {loading ? '作成中…' : '商談作成'}
         </Button>
       </PageActions>

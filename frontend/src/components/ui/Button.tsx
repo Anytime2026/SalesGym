@@ -33,11 +33,7 @@ function buildClassName(
   extra?: string,
 ): string {
   const legacy =
-    variant === 'filled'
-      ? 'primary'
-      : variant === 'tinted'
-        ? 'secondary'
-        : ''
+    variant === 'filled' ? 'primary' : variant === 'tinted' ? 'secondary' : ''
   return [
     'btn',
     `btn--${variant}`,
