@@ -23,7 +23,7 @@ async def test_create_program_generates_customer_profile(client: AsyncClient) ->
 
 
 @pytest.mark.asyncio
-async def test_true_challenge_hidden_until_all_sessions_done(client: AsyncClient) -> None:
+async def test_true_challenge_revealed_after_all_sessions_done(client: AsyncClient) -> None:
     program = await create_program(client, total_sessions=1)
     program_id = program["id"]
     assert program["customer_profile"]["true_challenge"] is None
@@ -41,9 +41,8 @@ async def test_true_challenge_hidden_until_all_sessions_done(client: AsyncClient
     detail = await client.get(f"/api/programs/{program_id}")
     assert detail.status_code == 200
     body = detail.json()
-    # 全回完了後も総評完了まではユーザーに非公開（要件 §5.5）
-    assert body["reveal_challenge"] is False
-    assert body["customer_profile"]["true_challenge"] is None
+    assert body["reveal_challenge"] is True
+    assert body["customer_profile"]["true_challenge"]
     assert body["status"] in ("all_sessions_done", "overall_review_requested")
 
 

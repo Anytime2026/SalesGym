@@ -9,6 +9,17 @@ class ProgramStatus(str, enum.Enum):
     CLOSED = "closed"
 
 
+REVEAL_CHALLENGE_STATUSES = frozenset({
+    ProgramStatus.ALL_SESSIONS_DONE.value,
+    ProgramStatus.OVERALL_REVIEW_REQUESTED.value,
+    ProgramStatus.CLOSED.value,
+})
+
+
+def should_reveal_true_challenge(status: str) -> bool:
+    return status in REVEAL_CHALLENGE_STATUSES
+
+
 class SessionStatus(str, enum.Enum):
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"

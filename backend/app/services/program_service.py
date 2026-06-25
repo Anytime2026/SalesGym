@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import get_settings
-from app.domain.enums import ProgramStatus, SessionStatus
+from app.domain.enums import ProgramStatus, SessionStatus, should_reveal_true_challenge
 from app.domain.models import CustomerProfile, CustomerState, HearingSession, Program
 from app.domain.schemas import (
     CustomerProfileResponse,
@@ -136,7 +136,7 @@ class ProgramService:
         return result.scalar_one_or_none()
 
     def to_response(self, program: Program) -> ProgramResponse:
-        reveal = program.status == ProgramStatus.CLOSED.value
+        reveal = should_reveal_true_challenge(program.status)
 
         profile_resp = None
         if program.customer_profile:
