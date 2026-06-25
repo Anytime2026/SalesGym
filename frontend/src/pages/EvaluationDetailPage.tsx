@@ -1,5 +1,9 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { LoadingScreen } from '../components/LoadingScreen'
+import { PageActions, PageSection, PageShell } from '../components/PageShell'
+import { Button } from '../components/ui/Button'
+import { useDeferredLoading } from '../hooks/useDeferredLoading'
 import { getProgram, getSession } from '../lib/api'
 import { findRegistryEntry } from '../lib/registry'
 import type { HearingSession, Program } from '../lib/types'
@@ -11,6 +15,7 @@ export function EvaluationDetailPage() {
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const showLoadingScreen = useDeferredLoading(loading)
 
   useEffect(() => {
     if (!id) return
@@ -24,9 +29,21 @@ export function EvaluationDetailPage() {
       .finally(() => setLoading(false))
   }, [id])
 
-  if (loading) return <div className="card">読み込み中…</div>
+  if (showLoadingScreen) return <LoadingScreen message="評価を読み込み中" />
+  if (loading) return null
   if (error || !session || !program)
-    return <div className="card">{error ?? 'データがありません'}</div>
+    return (
+      <PageShell
+        title={error ?? 'データがありません'}
+        illustration="/images/!-bear.svg"
+      >
+        <PageActions>
+          <Button variant="gray" to="/evaluations">
+            一覧に戻る
+          </Button>
+        </PageActions>
+      </PageShell>
+    )
 
   const entry = findRegistryEntry(program.id)
   const industryLabel = entry
@@ -45,54 +62,21 @@ export function EvaluationDetailPage() {
     program?.status === 'all_sessions_done'
 
   return (
-    <div className="card wide" style={{ maxWidth: '800px' }}>
-      <h2>商談評価詳細</h2>
+    <PageShell
+      width="wide"
+      title="商談評価詳細"
+      subtitle={`${industryLabel} — 第 ${session.session_number} 回商談`}
+      illustration="/images/Thinking_Bear.svg"
+    >
+      <p className="small" style={{ margin: 0 }}>
+        {session.ended_at
+          ? `実施日: ${new Date(session.ended_at).toLocaleDateString()}`
+          : session.title}
+      </p>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: '20px',
-          borderBottom: '2px solid var(--color-sticker-black)',
-          paddingBottom: '10px',
-        }}
-      >
-        <div>
-          <span style={{ fontWeight: 'bold', color: 'var(--color-ink-black)' }}>
-            {industryLabel} - 第 {session.session_number} 回商談
-          </span>
-        </div>
-        <div className="small">
-          {session.ended_at
-            ? `実施日: ${new Date(session.ended_at).toLocaleDateString()}`
-            : session.title}
-        </div>
-      </div>
-
-      <div style={{ marginBottom: 20 }}>
-        <p
-          style={{
-            fontWeight: 'bold',
-            fontSize: '15px',
-            color: 'var(--color-ink-black)',
-            marginBottom: '10px',
-          }}
-        >
-          💬 会話履歴
-        </p>
-        <div
-          style={{
-            background: 'var(--color-morning-fog)',
-            padding: '15px',
-            borderRadius: '24px',
-            border: '2px solid var(--color-sticker-black)',
-            maxHeight: '260px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-          }}
-        >
+      <PageSection variant="paper">
+        <p className="page-section__label">会話履歴</p>
+        <div className="chat-log">
           {session.transcript ? (
             session.transcript.split('\n').map((line, idx) => {
               const isUser = line.startsWith('営業:')
@@ -103,33 +87,9 @@ export function EvaluationDetailPage() {
               return (
                 <div
                   key={idx}
-                  style={{
-                    alignSelf: isUser ? 'flex-end' : 'flex-start',
-                    maxWidth: '85%',
-                    background: isUser
-                      ? 'var(--color-kofi-blue)'
-                      : 'var(--color-paper-white)',
-                    color: 'var(--color-ink-black)',
-                    padding: '10px 14px',
-                    borderRadius: '12px',
-                    borderBottomRightRadius: isUser ? '2px' : '12px',
-                    borderBottomLeftRadius: isUser ? '12px' : '2px',
-                    boxShadow: 'none',
-                    border: '2px solid var(--color-sticker-black)',
-                    fontSize: '13.5px',
-                    lineHeight: '1.4',
-                  }}
+                  className={`chat-bubble ${isUser ? 'chat-bubble--user' : 'chat-bubble--ai'}`}
                 >
-                  <div
-                    style={{
-                      fontSize: '10px',
-                      opacity: 0.8,
-                      fontWeight: 'bold',
-                      marginBottom: '3px',
-                    }}
-                  >
-                    {sender}
-                  </div>
+                  <span className="chat-bubble__sender">{sender}</span>
                   {content}
                 </div>
               )
@@ -140,146 +100,56 @@ export function EvaluationDetailPage() {
             </p>
           )}
         </div>
-      </div>
+      </PageSection>
 
       {sessionSummary && (
-        <div
-          style={{
-            borderTop: '2px solid var(--color-sticker-black)',
-            paddingTop: 15,
-            marginBottom: 20,
-          }}
-        >
-          <h3
-            style={{
-              marginTop: 0,
-              color: 'var(--color-ink-black)',
-              borderBottom: '2px solid var(--color-sticker-black)',
-              paddingBottom: '8px',
-            }}
-          >
-            📋 セッション要約
-          </h3>
-          <div
-            className="msg ai"
-            style={{
-              background: 'var(--color-oat-cream)',
-              border: '2px solid var(--color-sticker-black)',
-              width: '100%',
-              margin: 0,
-              padding: 15,
-              borderRadius: '24px',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: '13.5px',
-                lineHeight: '1.6',
-                color: 'var(--color-ink-black)',
-              }}
-            >
-              {sessionSummary}
-            </p>
-          </div>
-        </div>
+        <PageSection variant="oat">
+          <h3 className="page-section__heading">セッション要約</h3>
+          <p className="review-block__body">{sessionSummary}</p>
+        </PageSection>
       )}
 
-      <div
-        style={{
-          background: 'var(--color-oat-cream)',
-          padding: 20,
-          borderRadius: '24px',
-          border: '2px solid var(--color-sticker-black)',
-          marginBottom: 25,
-        }}
-      >
-        <h3
-          style={{
-            marginTop: 0,
-            borderBottom: '2px solid var(--color-sticker-black)',
-            paddingBottom: '8px',
-            color: 'var(--color-ink-black)',
-          }}
-        >
-          📝 先輩からの評価
-        </h3>
+      <PageSection variant="paper">
+        <h3 className="page-section__heading">先輩からの評価</h3>
         {session.evaluations && session.evaluations.length > 0 ? (
           session.evaluations.map((ev) => (
-            <div
-              key={ev.id}
-              style={{
-                background: 'var(--color-paper-white)',
-                padding: 14,
-                borderRadius: '16px',
-                marginBottom: 10,
-                border: '2px solid var(--color-sticker-black)',
-              }}
-            >
-              <p
-                className="small"
-                style={{
-                  margin: '0 0 6px',
-                  fontWeight: 'bold',
-                  color: 'var(--color-ink-black)',
-                }}
-              >
-                {ev.evaluator_id}
-              </p>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: '13.5px',
-                  lineHeight: 1.6,
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
+            <div key={ev.id} className="review-block">
+              <p className="review-block__author">{ev.evaluator_id}</p>
+              <p className="review-block__body">
                 {ev.content || '（評価内容なし）'}
               </p>
             </div>
           ))
         ) : (
-          <p
-            className="small"
-            style={{ margin: 0, color: 'var(--color-ink-black)' }}
-          >
+          <p className="small" style={{ margin: 0 }}>
             先輩評価はまだ届いていません。HULFT
             経由で反映されるまでお待ちください。
           </p>
         )}
-      </div>
+      </PageSection>
 
-      <div style={{ display: 'flex', gap: '12px' }}>
-        <Link
-          to="/evaluations"
-          className="btn secondary"
-          style={{ flex: 1, margin: 0 }}
-        >
+      <PageActions>
+        <Button variant="gray" className="btn--shrink" to="/evaluations">
           一覧に戻る
-        </Link>
+        </Button>
         {allSessionsDone && showOverallReview ? (
           <>
-            <Link
-              to="/"
-              className="btn secondary"
-              style={{ flex: 1, margin: 0 }}
-            >
+            <Button variant="tinted" className="btn--grow" to="/">
               ホームに戻る
-            </Link>
-            <Link
+            </Button>
+            <Button
+              className="btn--grow"
               to={`/overall-review?program_id=${program.id}`}
-              className="btn primary"
-              style={{ flex: 1, margin: 0 }}
             >
               総合評価へ
-            </Link>
+            </Button>
           </>
         ) : (
-          <Link to="/" className="btn primary" style={{ flex: 1, margin: 0 }}>
+          <Button className="btn--grow" to="/">
             ホームに戻る
-          </Link>
+          </Button>
         )}
-      </div>
-    </div>
+      </PageActions>
+    </PageShell>
   )
 }

@@ -1,0 +1,306 @@
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.loading-screen--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--surface-canvas);
+  padding: 24px;
+}
+
+.loading-screen--thinking.loading-screen--fullscreen {
+  justify-content: flex-start;
+  padding-top: clamp(28px, 7vh, 64px);
+  gap: 0;
+}
+
+.loading-screen--thinking .loading-screen__logo {
+  margin-bottom: clamp(40px, 10vh, 88px);
+}
+
+.loading-screen--thinking .loading-screen__stage {
+  width: min(140px, 35vw);
+  height: min(200px, 48vw);
+  margin-bottom: 20px;
+}
+
+.loading-screen--inline {
+  width: 100%;
+  padding: 32px 16px;
+}
+
+.loading-screen__logo {
+  width: min(220px, 70vw);
+  height: auto;
+}
+
+.loading-screen__stage {
+  position: relative;
+  width: min(180px, 45vw);
+  height: min(160px, 38vw);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.loading-screen__bear {
+  position: relative;
+  width: min(140px, 34vw);
+  aspect-ratio: 1483 / 1294;
+}
+
+.loading-screen__bear-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.loading-screen__bear-frame--open {
+  animation: loading-bear-mouth-open 0.8s steps(1, end) infinite;
+}
+
+.loading-screen__bear-frame--closed {
+  animation: loading-bear-mouth-closed 0.8s steps(1, end) infinite;
+}
+
+.loading-screen__levelup {
+  position: absolute;
+  right: -4px;
+  bottom: 0;
+  width: min(52px, 14vw);
+  height: auto;
+  transform-origin: center bottom;
+  animation: loading-levelup-grow 1.2s ease-in-out infinite;
+}
+
+.loading-screen__thinking-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-screen__questions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(4px, 1.2vw, 10px);
+  min-height: min(40px, 10vw);
+  margin-bottom: clamp(2px, 0.8vw, 8px);
+}
+
+.loading-screen__question {
+  width: min(28px, 7vw);
+  height: auto;
+  opacity: 0;
+  transform: scale(0.5) translateY(8px);
+}
+
+.loading-screen__question--1 {
+  animation: loading-question-1 2.4s ease-in-out infinite;
+}
+
+.loading-screen__question--2 {
+  animation: loading-question-2 2.4s ease-in-out infinite;
+}
+
+.loading-screen__question--3 {
+  animation: loading-question-3 2.4s ease-in-out infinite;
+}
+
+.loading-screen__thinking-bear {
+  width: min(120px, 30vw);
+  height: auto;
+}
+
+.loading-screen__message {
+  display: inline-flex;
+  align-items: baseline;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-ink-black);
+}
+
+.loading-screen__dots {
+  display: inline-block;
+  width: 3ch;
+  text-align: left;
+}
+
+.loading-screen__hint {
+  margin: 20px 0 0;
+  max-width: 320px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--color-ink-black) 70%, transparent);
+}
+
+.loading-screen__dots::after {
+  content: '';
+  animation: loading-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes loading-question-1 {
+  0%,
+  4% {
+    opacity: 0;
+    transform: scale(0.5) translateY(8px);
+  }
+
+  8% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-3px);
+  }
+
+  12%,
+  68% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  78%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translateY(8px);
+  }
+}
+
+@keyframes loading-question-2 {
+  0%,
+  16% {
+    opacity: 0;
+    transform: scale(0.5) translateY(8px);
+  }
+
+  20% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-3px);
+  }
+
+  24%,
+  68% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  78%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translateY(8px);
+  }
+}
+
+@keyframes loading-question-3 {
+  0%,
+  28% {
+    opacity: 0;
+    transform: scale(0.5) translateY(8px);
+  }
+
+  32% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-3px);
+  }
+
+  36%,
+  68% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  78%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translateY(8px);
+  }
+}
+
+@keyframes loading-bear-mouth-open {
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes loading-bear-mouth-closed {
+  0%,
+  49% {
+    opacity: 0;
+  }
+
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loading-levelup-grow {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+    opacity: 0.65;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes loading-dots {
+  0% {
+    content: '';
+  }
+
+  25% {
+    content: '.';
+  }
+
+  50% {
+    content: '..';
+  }
+
+  75%,
+  100% {
+    content: '...';
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__bear,
+  .loading-screen__question,
+  .loading-screen__bear-frame--open,
+  .loading-screen__bear-frame--closed,
+  .loading-screen__levelup,
+  .loading-screen__dots::after {
+    animation: none;
+  }
+
+  .loading-screen__question {
+    opacity: 1;
+    transform: none;
+  }
+
+  .loading-screen__bear-frame--closed {
+    opacity: 0;
+  }
+
+  .loading-screen__dots::after {
+    content: '...';
+  }
+}

@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { LoadingScreen } from '../components/LoadingScreen'
+import { PageActions, PageSection, PageShell } from '../components/PageShell'
+import { Button } from '../components/ui/Button'
+import { useDeferredLoading } from '../hooks/useDeferredLoading'
 import { getProgram } from '../lib/api'
 import { findRegistryEntry, getCurrentProgramId } from '../lib/registry'
 import type { Program } from '../lib/types'
@@ -10,6 +14,7 @@ export function OverallReviewPage() {
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const showLoadingScreen = useDeferredLoading(loading)
 
   useEffect(() => {
     const programId = searchParams.get('program_id') ?? getCurrentProgramId()
@@ -25,159 +30,88 @@ export function OverallReviewPage() {
       .finally(() => setLoading(false))
   }, [searchParams])
 
-  if (loading) return <div className="card">読み込み中…</div>
+  if (showLoadingScreen) return <LoadingScreen message="総評を読み込み中" />
+  if (loading) return null
   if (error || !program)
-    return <div className="card">{error ?? 'データがありません'}</div>
+    return (
+      <PageShell
+        title={error ?? 'データがありません'}
+        illustration="/images/!-bear.svg"
+      >
+        <PageActions>
+          <Button to="/">ホームに戻る</Button>
+        </PageActions>
+      </PageShell>
+    )
 
   const entry = findRegistryEntry(program.id)
   const meta = entry ? INDUSTRY_META[entry.industry] : null
   const trueChallenge = program.customer_profile?.true_challenge
   const overallReviews = program.overall_reviews ?? []
 
-  return (
-    <div className="card wide" style={{ maxWidth: '800px' }}>
-      <h2>商談シリーズ完了・総評</h2>
-      <p className="small">
-        {meta
-          ? `${meta.company} の ${meta.personName} ${meta.honorific} との商談シリーズ（全 ${program.total_sessions} 回）`
-          : `${program.field} の商談シリーズ（全 ${program.total_sessions} 回）`}
-        が完了しました
-      </p>
+  const subtitle = meta
+    ? `${meta.company} の ${meta.personName} ${meta.honorific} との商談シリーズ（全 ${program.total_sessions} 回）が完了しました`
+    : `${program.field} の商談シリーズ（全 ${program.total_sessions} 回）が完了しました`
 
-      <div
-        style={{
-          background: 'var(--color-kofi-blue)',
-          padding: 20,
-          borderRadius: '24px',
-          margin: '20px 0',
-          border: '2px solid var(--color-sticker-black)',
-        }}
-      >
-        <p
-          style={{
-            fontWeight: 'bold',
-            margin: '0 0 10px 0',
-            color: 'var(--color-ink-black)',
-            fontSize: '15px',
-          }}
-        >
-          🔑 顧客の「真の課題」
-        </p>
+  return (
+    <PageShell
+      width="wide"
+      title="商談シリーズ完了・総評"
+      subtitle={subtitle}
+      illustration="/images/LevelUp.svg"
+    >
+      <PageSection variant="blue">
+        <p className="page-section__label">顧客の「真の課題」</p>
         {program.reveal_challenge && trueChallenge ? (
-          <p
-            style={{
-              margin: 0,
-              fontSize: 14,
-              lineHeight: '1.6',
-              color: 'var(--color-ink-black)',
-            }}
-          >
-            {trueChallenge}
-          </p>
+          <p className="review-block__body">{trueChallenge}</p>
         ) : (
-          <p
-            className="small"
-            style={{ margin: 0, color: 'var(--color-ink-black)' }}
-          >
+          <p className="small" style={{ margin: 0 }}>
             全回完了後、先輩総評が完了すると真の課題が開示されます。
           </p>
         )}
-      </div>
+      </PageSection>
 
-      <div
-        style={{
-          background: 'var(--color-oat-cream)',
-          padding: 20,
-          borderRadius: '24px',
-          border: '2px solid var(--color-sticker-black)',
-          marginBottom: 20,
-        }}
-      >
-        <h3
-          style={{
-            marginTop: 0,
-            borderBottom: '2px solid var(--color-sticker-black)',
-            paddingBottom: '8px',
-            color: 'var(--color-ink-black)',
-          }}
-        >
-          📝 先輩によるシリーズ総評
-        </h3>
+      <PageSection variant="paper">
+        <h3 className="page-section__heading">先輩によるシリーズ総評</h3>
         {overallReviews.length > 0 ? (
           overallReviews.map((review) => (
-            <div
-              key={review.id}
-              style={{
-                fontSize: 14,
-                lineHeight: 1.6,
-                color: 'var(--color-ink-black)',
-                whiteSpace: 'pre-wrap',
-                marginBottom: 16,
-                paddingBottom: 16,
-                borderBottom: '1px solid var(--color-sticker-black)',
-              }}
-            >
-              <p
-                className="small"
-                style={{
-                  fontWeight: 'bold',
-                  color: 'var(--color-ink-black)',
-                  margin: '0 0 8px',
-                }}
-              >
-                {review.evaluator_id}
+            <div key={review.id} className="review-block">
+              <p className="review-block__author">{review.evaluator_id}</p>
+              <p className="review-block__body">
+                {review.content || '（評価内容なし）'}
               </p>
-              {review.content || '（評価内容なし）'}
             </div>
           ))
         ) : (
-          <p
-            className="small"
-            style={{ margin: 0, color: 'var(--color-ink-black)' }}
-          >
+          <p className="small" style={{ margin: 0 }}>
             先輩総評はまだ届いていません。HULFT
             経由で反映されるまでお待ちください。
           </p>
         )}
-      </div>
+      </PageSection>
 
       {program.customer_state?.session_summaries &&
         program.customer_state.session_summaries.length > 0 && (
-          <div style={{ marginBottom: 20 }}>
-            <h3
-              style={{
-                borderBottom: '2px solid var(--color-sticker-black)',
-                paddingBottom: 8,
-                color: 'var(--color-ink-black)',
-              }}
-            >
-              各回サマリ
-            </h3>
-            <ul style={{ paddingLeft: 20, margin: 0 }}>
+          <PageSection variant="oat">
+            <h3 className="page-section__heading">各回サマリ</h3>
+            <ul className="summary-list">
               {program.customer_state.session_summaries.map((s) => (
-                <li
-                  key={s.session_number}
-                  style={{ marginBottom: 10, fontSize: 13.5, lineHeight: 1.5 }}
-                >
-                  <b>第 {s.session_number} 回:</b> {s.summary}
+                <li key={s.session_number}>
+                  <strong>第 {s.session_number} 回:</strong> {s.summary}
                 </li>
               ))}
             </ul>
-          </div>
+          </PageSection>
         )}
 
-      <div style={{ display: 'flex', gap: '12px' }}>
-        <Link
-          to="/evaluations"
-          className="btn secondary"
-          style={{ flex: 1, margin: 0 }}
-        >
+      <PageActions>
+        <Button variant="gray" className="btn--shrink" to="/evaluations">
           評価履歴へ戻る
-        </Link>
-        <Link to="/" className="btn primary" style={{ flex: 1, margin: 0 }}>
-          🏠 トップに戻る
-        </Link>
-      </div>
-    </div>
+        </Button>
+        <Button className="btn--shrink" to="/">
+          トップに戻る
+        </Button>
+      </PageActions>
+    </PageShell>
   )
 }

@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { LoadingScreen } from '../components/LoadingScreen'
+import { PageSection, PageShell } from '../components/PageShell'
+import { Button } from '../components/ui/Button'
+import { useDeferredLoading } from '../hooks/useDeferredLoading'
 import { ACTIVE_PROGRAM_STATUSES, getProgram } from '../lib/api'
 import {
   clearLocalData,
@@ -18,6 +22,7 @@ type ActiveProgram = {
 export function HomePage() {
   const [activePrograms, setActivePrograms] = useState<ActiveProgram[]>([])
   const [loading, setLoading] = useState(true)
+  const showLoadingScreen = useDeferredLoading(loading)
 
   useEffect(() => {
     const registry = loadRegistry()
@@ -67,42 +72,38 @@ export function HomePage() {
   }
 
   return (
-    <div className="card" style={{ maxWidth: '500px' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>
-        営業ヒアリングロープレ
-      </h2>
-      <p
-        className="small"
-        style={{ textAlign: 'center', marginBottom: '24px' }}
-      >
-        AI顧客を相手にしたロールプレイトレーニング
-      </p>
+    <PageShell width="narrow" brandLink={false}>
+      <div className="page-hero">
+        <img
+          className="page-hero__image"
+          src="/images/main.svg"
+          alt=""
+          draggable={false}
+        />
+        <div className="page-hero__text">
+          <p className="page-hero__tagline">
+            AI顧客を相手にした営業ヒアリングのロールプレイトレーニング。実践的な商談スキルを、くまトレーナーと一緒に鍛えましょう。
+          </p>
+        </div>
+      </div>
 
-      <Link to="/settings" className="btn primary" style={{ padding: '16px' }}>
-        ▶ 新規商談作成
-      </Link>
+      <div className="page-cta-stack">
+        <Button to="/settings" size="large" autoWidth>
+          新規商談作成
+        </Button>
+        <Button to="/evaluations" variant="tinted" autoWidth>
+          評価履歴・総評一覧
+        </Button>
+      </div>
 
-      {loading && (
-        <p className="small" style={{ marginTop: 16 }}>
-          読み込み中…
-        </p>
+      {showLoadingScreen && (
+        <LoadingScreen variant="inline" showLogo={false} message="読み込み中" />
       )}
 
       {!loading && activePrograms.length > 0 && (
-        <div style={{ marginTop: '25px', marginBottom: '15px' }}>
-          <p
-            className="small"
-            style={{
-              fontWeight: 'bold',
-              margin: '0 0 10px 0',
-              color: 'var(--color-ink-black)',
-            }}
-          >
-            進行中のプログラム
-          </p>
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-          >
+        <PageSection variant="paper">
+          <p className="page-section__label">進行中のプログラム</p>
+          <div className="page-list">
             {activePrograms.map(({ registryId, industry, program }) => {
               const isCompleted =
                 program.completed_sessions >= program.total_sessions
@@ -114,76 +115,33 @@ export function HomePage() {
                       ? `/overall-review?program_id=${program.id}`
                       : '/pre-session'
                   }
-                  className="btn secondary"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    padding: '16px 20px',
-                    margin: 0,
-                    background: 'var(--color-oat-cream)',
-                    color: 'var(--color-ink-black)',
-                    border: '2px solid var(--color-sticker-black)',
-                    borderRadius: '24px',
-                  }}
+                  className="page-list__item page-list__item--oat"
                   onClick={() => setCurrentProgramId(registryId)}
                 >
-                  <div style={{ fontWeight: 'bold', fontSize: '15px' }}>
-                    {isCompleted ? (
-                      <>
-                        🏆 {INDUSTRY_META[industry]?.label} - 商談シリーズ完了
-                        (総評を見る)
-                      </>
-                    ) : (
-                      <>
-                        ⏱ {INDUSTRY_META[industry]?.label} - 進行中 (
-                        {program.completed_sessions + 1} /{' '}
-                        {program.total_sessions}回目)
-                      </>
-                    )}
-                  </div>
-                  <div
-                    style={{ fontSize: '11px', opacity: 0.8, marginTop: '5px' }}
-                  >
+                  <p className="page-list__item-title">
+                    {isCompleted
+                      ? `${INDUSTRY_META[industry]?.label} — 商談シリーズ完了`
+                      : `${INDUSTRY_META[industry]?.label} — 第 ${program.completed_sessions + 1} / ${program.total_sessions} 回`}
+                  </p>
+                  <p className="page-list__item-meta">
                     作成日: {formatDate(program.created_at)}
-                  </div>
+                  </p>
                 </Link>
               )
             })}
           </div>
-        </div>
+        </PageSection>
       )}
 
-      <Link
-        to="/evaluations"
-        className="btn primary"
-        style={{ marginTop: '12px' }}
-      >
-        評価履歴・総評一覧
-      </Link>
-
-      <div
-        style={{
-          borderTop: '1px solid #eee',
-          marginTop: '30px',
-          paddingTop: '15px',
-          textAlign: 'center',
-        }}
-      >
+      <footer className="page-footer">
         <button
+          type="button"
+          className="page-footer__link"
           onClick={handleReset}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#999',
-            fontSize: '11px',
-            textDecoration: 'underline',
-            cursor: 'pointer',
-          }}
         >
-          ⚙️ ローカルデータをリセット
+          ローカルデータをリセット
         </button>
-      </div>
-    </div>
+      </footer>
+    </PageShell>
   )
 }

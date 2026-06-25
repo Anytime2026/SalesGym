@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ControlBar } from '../components/roleplay/ControlBar'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { MeetingShell } from '../components/roleplay/MeetingShell'
 import { ParticipantTile } from '../components/roleplay/ParticipantTile'
 import { TranscriptDrawer } from '../components/roleplay/TranscriptDrawer'
 import '../components/roleplay/roleplay.css'
 import { useHearingWebSocket } from '../hooks/useHearingWebSocket'
+import { useDeferredLoading } from '../hooks/useDeferredLoading'
 import { usePingInterval, useSessionTimer } from '../hooks/useSessionTimer'
 import { usePushToTalk } from '../hooks/usePushToTalk'
 import { endSession, getApiBase, getProgram, getSession } from '../lib/api'
@@ -19,6 +21,8 @@ export function RoleplayMeetingPage() {
   const [ended, setEnded] = useState(false)
   const [transcriptOpen, setTranscriptOpen] = useState(true)
   const [userSpeaking, setUserSpeaking] = useState(false)
+  const sessionLoading = !session && Boolean(sessionId)
+  const showLoadingScreen = useDeferredLoading(sessionLoading)
 
   const handleSessionEnded = useCallback(
     async (reason: string) => {
@@ -115,22 +119,24 @@ export function RoleplayMeetingPage() {
   const customerName = program?.customer_profile?.name
   const customerRole = program?.customer_profile?.role_title ?? '見込み顧客'
 
+  if (showLoadingScreen) {
+    return <LoadingScreen message="セッションを読み込み中" />
+  }
+
+  if (sessionLoading) {
+    return null
+  }
+
   if (!session) {
-    return (
-      <div className="meeting-shell">
-        <div className="meeting-complete">セッションを読み込み中…</div>
-      </div>
-    )
+    return null
   }
 
   if (ended) {
     return (
-      <div className="meeting-shell">
-        <div className="meeting-complete">
-          <h2>セッションが終了しました</h2>
-          <p>評価詳細画面へ移動しています。しばらくお待ちください…</p>
-        </div>
-      </div>
+      <LoadingScreen
+        message="セッションを終了しています"
+        hint="評価画面へ移動します。しばらくお待ちください…"
+      />
     )
   }
 

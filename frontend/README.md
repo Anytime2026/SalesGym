@@ -61,3 +61,17 @@ ECS タスクの `CORS_ORIGINS` に `http://localhost:5173` と `http://127.0.0.
 # frontend/.env.development.local に以下を設定
 # VITE_DEV_BACKEND_URL=http://127.0.0.1:8000
 ```
+
+## CI（GitHub Actions）
+
+`main` / `master` 向け PR では **Prettier + ESLint** が走る（`npm ci` 使用）。
+
+PR 前にローカルで確認:
+
+```bash
+cd frontend
+npm ci
+npm run ci
+```
+
+詳細: [`docs/20260624-ci-pass-procedure.md`](../docs/20260624-ci-pass-procedure.md)
