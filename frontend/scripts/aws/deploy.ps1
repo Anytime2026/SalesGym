@@ -1,4 +1,6 @@
-# Syodan frontend — AWS deploy (S3 + CloudFront)
+# Syodan frontend — AWS deploy constants (S3 + CloudFront)
+# 再デプロイ時は deploy.ps1 を実行
+
 $ErrorActionPreference = "Stop"
 
 $ACCOUNT_ID = "542000445970"

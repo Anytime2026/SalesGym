@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
-from app.domain.enums import ProgramStatus
+from app.domain.enums import should_reveal_true_challenge
 from app.domain.models import Program
 from app.domain.schemas import SessionCreate, SessionListItem, SessionResponse
 from app.services.session_finalize import SessionFinalizeService
@@ -43,7 +43,7 @@ async def get_session(session_id: UUID, db: AsyncSession = Depends(get_db)) -> S
         raise HTTPException(status_code=404, detail="Session not found")
     result = await db.execute(select(Program.status).where(Program.id == session.program_id))
     program_status = result.scalar_one_or_none()
-    reveal = program_status == ProgramStatus.CLOSED.value
+    reveal = should_reveal_true_challenge(program_status) if program_status else False
     return service.to_response(session, reveal_challenge=reveal)
 
 

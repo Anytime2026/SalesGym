@@ -66,7 +66,7 @@ export function OverallReviewPage() {
           <p className="review-block__body">{trueChallenge}</p>
         ) : (
           <p className="small" style={{ margin: 0 }}>
-            全回完了後、先輩総評が完了すると真の課題が開示されます。
+            全回の商談が完了すると真の課題が開示されます。
           </p>
         )}
       </PageSection>
