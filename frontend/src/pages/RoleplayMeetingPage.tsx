@@ -33,11 +33,9 @@ export function RoleplayMeetingPage() {
       } catch {
         /* already ended */
       }
-      if (reason === 'timeout') {
-        /* stay on complete screen */
-      }
+      navigate(`/evaluations/${sessionId}`)
     },
-    [sessionId, ended],
+    [sessionId, ended, navigate],
   )
 
   const ws = useHearingWebSocket({
@@ -99,6 +97,7 @@ export function RoleplayMeetingPage() {
     } catch {
       /* ignore */
     }
+    navigate(`/evaluations/${sessionId}`)
   }
 
   async function handlePttDown() {
@@ -137,25 +136,7 @@ export function RoleplayMeetingPage() {
       <div className="meeting-shell">
         <div className="meeting-complete">
           <h2>セッションが終了しました</h2>
-          <p>
-            {session.title ?? `第${session.session_number}回`}{' '}
-            の処理をバックエンドで実行中です。
-          </p>
-          <Link to={`/evaluations/${sessionId}`}>評価詳細へ</Link>
-          {allSessionsDone && showOverallReview && program && (
-            <Link to={`/overall-review?program_id=${program.id}`}>
-              シリーズ総評へ
-            </Link>
-          )}
-          {!allSessionsDone && program && (
-            <Link
-              to="/pre-session"
-              onClick={() => setCurrentProgramId(program.id)}
-            >
-              次のセッションを設定
-            </Link>
-          )}
-          <Link to="/evaluations">評価一覧へ</Link>
+          <p>評価詳細画面へ移動しています。しばらくお待ちください…</p>
         </div>
       </div>
     )
