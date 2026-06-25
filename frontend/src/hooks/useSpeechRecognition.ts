@@ -1,12 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-interface UseSpeechRecognitionProps {
-  onResult: (text: string) => void
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition
 }
 
-function getSpeechRecognitionCtor(): SpeechRecognitionConstructor | undefined {
-  if (typeof window === 'undefined') return undefined
-  return window.SpeechRecognition ?? window.webkitSpeechRecognition
+interface WindowWithSpeechRecognition extends Window {
+  SpeechRecognition?: SpeechRecognitionConstructor
+  webkitSpeechRecognition?: SpeechRecognitionConstructor
+}
+
+interface UseSpeechRecognitionProps {
+  onResult: (text: string) => void
 }
 
 export function useSpeechRecognition({ onResult }: UseSpeechRecognitionProps) {
@@ -14,33 +18,37 @@ export function useSpeechRecognition({ onResult }: UseSpeechRecognitionProps) {
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   useEffect(() => {
-    const SpeechRecognition = getSpeechRecognitionCtor()
-    if (!SpeechRecognition) return
+    if (typeof window === 'undefined') return
 
-    try {
-      const recognition = new SpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = false
-      recognition.lang = 'ja-JP'
+    const w = window as unknown as WindowWithSpeechRecognition
+    const SpeechRecognitionConstructor =
+      w.SpeechRecognition || w.webkitSpeechRecognition
+    if (SpeechRecognitionConstructor) {
+      try {
+        const recognition = new SpeechRecognitionConstructor()
+        recognition.continuous = false
+        recognition.interimResults = false
+        recognition.lang = 'ja-JP'
 
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        const transcript = event.results[0][0].transcript
-        onResult(transcript)
-        setIsListening(false)
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          const transcript = event.results[0][0].transcript
+          onResult(transcript)
+          setIsListening(false)
+        }
+
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          console.error('Speech recognition error', event.error)
+          setIsListening(false)
+        }
+
+        recognition.onend = () => {
+          setIsListening(false)
+        }
+
+        recognitionRef.current = recognition
+      } catch (e) {
+        console.error('Failed to initialize SpeechRecognition', e)
       }
-
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error('Speech recognition error', event.error)
-        setIsListening(false)
-      }
-
-      recognition.onend = () => {
-        setIsListening(false)
-      }
-
-      recognitionRef.current = recognition
-    } catch (e) {
-      console.error('Failed to initialize SpeechRecognition', e)
     }
   }, [onResult])
 
@@ -58,10 +66,14 @@ export function useSpeechRecognition({ onResult }: UseSpeechRecognitionProps) {
     }
   }, [isListening])
 
+  const w =
+    typeof window !== 'undefined'
+      ? (window as unknown as WindowWithSpeechRecognition)
+      : null
   return {
     isListening,
     startListening,
     stopListening,
-    supported: Boolean(getSpeechRecognitionCtor()),
+    supported: !!(w && (w.SpeechRecognition || w.webkitSpeechRecognition)),
   }
 }

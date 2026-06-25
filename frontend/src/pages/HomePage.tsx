@@ -55,14 +55,12 @@ export function HomePage() {
   const handleReset = () => {
     if (
       window.confirm(
-        'ブラウザに保存したプログラム一覧と設定が消去されます。バックエンドのデータは残ります。リセットしてよろしいですか？',
+        'ブラウザに保存した商談履歴と設定が消去されます。バックエンドのデータは残ります。リセットしてよろしいですか？',
       )
     ) {
       clearLocalData()
       setActivePrograms([])
-      alert(
-        'ローカルデータをクリアしました。新しい商談プログラムを作成してください。',
-      )
+      alert('ローカルデータをクリアしました。新しい商談を開始してください。')
     }
   }
 
@@ -79,7 +77,7 @@ export function HomePage() {
       </p>
 
       <Link to="/settings" className="btn primary" style={{ padding: '16px' }}>
-        ▶ 新規商談作成
+        ▶ 商談開始
       </Link>
 
       {loading && (
@@ -98,7 +96,7 @@ export function HomePage() {
               color: 'var(--color-ink-black)',
             }}
           >
-            進行中のプログラム
+            進行中の商談
           </p>
           <div
             style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
