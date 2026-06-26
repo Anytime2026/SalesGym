@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { StandalonePageLayout } from './components/StandalonePageLayout'
 import { FeedbackPage } from './pages/FeedbackPage'
 import { EvaluationDetailPage } from './pages/EvaluationDetailPage'
 import { EvaluationsPage } from './pages/EvaluationsPage'
@@ -18,11 +19,19 @@ export const router = createBrowserRouter([
   },
   {
     path: '/reviewer/evaluations/:token',
-    element: <ReviewerEvaluationPage />,
+    element: (
+      <StandalonePageLayout>
+        <ReviewerEvaluationPage />
+      </StandalonePageLayout>
+    ),
   },
   {
     path: '/reviewer/overall-review/:token',
-    element: <ReviewerOverallReviewPage />,
+    element: (
+      <StandalonePageLayout>
+        <ReviewerOverallReviewPage />
+      </StandalonePageLayout>
+    ),
   },
   {
     path: '/',

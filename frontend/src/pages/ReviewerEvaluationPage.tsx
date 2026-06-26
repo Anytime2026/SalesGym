@@ -5,7 +5,7 @@ import { PageSection, PageShell } from '../components/PageShell'
 import { Button } from '../components/ui/Button'
 import { InputField, TextAreaField } from '../components/ui/Form'
 import { useDeferredLoading } from '../hooks/useDeferredLoading'
-import { getReviewPage, submitSessionEvaluation } from '../lib/api'
+import { getApiBase, getReviewPage, submitSessionEvaluation } from '../lib/api'
 import type { ReviewPageData } from '../lib/types'
 
 export function ReviewerEvaluationPage() {
@@ -19,11 +19,17 @@ export function ReviewerEvaluationPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [audioError, setAudioError] = useState(false)
+
+  const recordingSrc = page?.recording_url
+    ? `${getApiBase()}${page.recording_url}`
+    : null
 
   useEffect(() => {
     if (!token) return
     setLoading(true)
     setError(null)
+    setAudioError(false)
     getReviewPage(token)
       .then(setPage)
       .catch(() => setError('評価ページの取得に失敗しました'))
@@ -84,10 +90,22 @@ export function ReviewerEvaluationPage() {
         </p>
       </PageSection>
 
-      {page.recording_url && (
+      {recordingSrc && (
         <PageSection variant="paper">
           <p className="page-section__label">録音</p>
-          <audio controls src={page.recording_url} style={{ width: '100%' }} />
+          {audioError ? (
+            <p className="review-block__body" role="alert">
+              録音の読み込みに失敗しました。ページを再読み込みしてください。
+            </p>
+          ) : (
+            <audio
+              controls
+              preload="metadata"
+              src={recordingSrc}
+              style={{ width: '100%' }}
+              onError={() => setAudioError(true)}
+            />
+          )}
         </PageSection>
       )}
 

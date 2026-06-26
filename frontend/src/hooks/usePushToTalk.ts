@@ -40,7 +40,7 @@ function downsampleBuffer(
 function isStreamUsable(stream: MediaStream | null): stream is MediaStream {
   return Boolean(
     stream?.active &&
-    stream.getAudioTracks().some((track) => track.readyState === 'live'),
+      stream.getAudioTracks().some((track) => track.readyState === 'live'),
   )
 }
 

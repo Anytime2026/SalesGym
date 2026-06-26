@@ -21,6 +21,7 @@ from app.domain.schemas import (
     SessionSummaryForReview,
 )
 from app.integrations.aws_clients import S3Client
+from app.utils.audio import normalize_recording_for_playback
 
 
 class EvaluationService:
@@ -44,9 +45,19 @@ class EvaluationService:
             goal=session.goal,
             true_challenge=profile.true_challenge if profile else "",
             formatted_transcript=session.formatted_transcript or session.transcript,
-            recording_url=self.s3.generate_presigned_url(session.recording_s3_key or ""),
+            recording_url=f"/api/review/{token}/recording" if session.recording_s3_key else None,
             evaluations=[EvaluationResponse.model_validate(e) for e in session.evaluations],
         )
+
+    async def get_session_recording(self, token: str) -> tuple[bytes, str] | None:
+        session = await self._get_session_by_token(token)
+        if not session or not session.recording_s3_key:
+            return None
+
+        raw = self.s3.get_bytes(session.recording_s3_key)
+        if not raw:
+            return None
+        return normalize_recording_for_playback(raw)
 
     async def submit_session_evaluation(
         self, token: str, evaluator_id: str, content: str

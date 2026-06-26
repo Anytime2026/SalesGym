@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -34,6 +35,20 @@ async def submit_overall_review(
         return await service.submit_overall_review(token, body.evaluator_id, body.content)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@router.get("/api/review/{token}/recording")
+async def get_session_recording(token: str, db: AsyncSession = Depends(get_db)) -> Response:
+    service = EvaluationService(db)
+    recording = await service.get_session_recording(token)
+    if not recording:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    body, media_type = recording
+    return Response(
+        content=body,
+        media_type=media_type,
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
 
 
 @router.get("/api/review/{token}", response_model=ReviewPageResponse)

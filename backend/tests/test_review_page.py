@@ -111,3 +111,31 @@ async def test_submit_session_evaluation_upserts_same_evaluator(client: AsyncCli
 async def test_review_page_not_found_for_invalid_token(client: AsyncClient) -> None:
     res = await client.get("/api/review/invalid-token-00000000000000000000000000000000")
     assert res.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_review_page_recording_is_playable_wav(client: AsyncClient) -> None:
+    program = await create_program(client)
+    session = await create_and_start_session(client, program["id"])
+
+    from app.api.routes import sessions as sessions_routes
+
+    sessions_routes.append_recording(str(session["id"]), b"\x00\x01" * 320)
+    sessions_routes.append_conversation(str(session["id"]), "user", "課題は？")
+    sessions_routes.append_conversation(str(session["id"]), "ai", "いくつかあります")
+    await client.post(f"/api/sessions/{session['id']}/end")
+
+    async with db_session_module.get_session_factory()() as db:
+        result = await db.execute(
+            select(HearingSession).where(HearingSession.id == UUID(session["id"]))
+        )
+        token = result.scalar_one().review_token
+
+    page = await client.get(f"/api/review/{token}")
+    assert page.status_code == 200
+    assert page.json()["recording_url"] == f"/api/review/{token}/recording"
+
+    recording = await client.get(f"/api/review/{token}/recording")
+    assert recording.status_code == 200
+    assert recording.headers["content-type"].startswith("audio/wav")
+    assert recording.content[:4] == b"RIFF"

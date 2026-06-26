@@ -14,6 +14,7 @@ from app.config import Settings, get_settings
 logger = logging.getLogger(__name__)
 
 _STUB_TTS_MP3 = Path(__file__).resolve().parent.parent / "assets" / "stub_tts.mp3"
+_STUB_S3_STORE: dict[str, tuple[bytes, str]] = {}
 
 _BOTO_CONFIG = Config(retries={"max_attempts": 3, "mode": "standard"})
 
@@ -384,6 +385,7 @@ class S3Client:
 
     def put_bytes(self, key: str, data: bytes, content_type: str = "application/octet-stream") -> str:
         if self.settings.aws_stub_mode:
+            _STUB_S3_STORE[key] = (data, content_type)
             logger.info("S3 stub put: %s (%d bytes)", key, len(data))
             return key
 
@@ -396,6 +398,21 @@ class S3Client:
             ServerSideEncryption="AES256",
         )
         return key
+
+    def get_bytes(self, key: str) -> bytes | None:
+        if not key:
+            return None
+        if self.settings.aws_stub_mode:
+            entry = _STUB_S3_STORE.get(key)
+            return entry[0] if entry else None
+
+        client = _s3_client(self.settings)
+        try:
+            response = client.get_object(Bucket=self.settings.s3_bucket_name, Key=key)
+        except (ClientError, BotoCoreError):
+            logger.exception("S3 get_object failed for key=%s", key)
+            return None
+        return response["Body"].read()
 
     def generate_presigned_url(self, key: str, expires_in: int = 3600) -> str | None:
         if not key:

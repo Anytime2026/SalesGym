@@ -13,6 +13,7 @@ from app.domain.models import CustomerProfile, CustomerState, HearingSession, Pr
 from app.integrations.aws_clients import BedrockClient, S3Client
 from app.services.hulft_client import HulftClient
 from app.services.prompts import ANALYSIS_SYSTEM
+from app.utils.audio import pcm16le_to_wav
 
 logger = logging.getLogger(__name__)
 
@@ -44,9 +45,10 @@ class SessionFinalizeService:
             transcript_lines.append(f"{speaker}: {turn.get('text', '')}")
         transcript = "\n".join(transcript_lines)
 
-        recording_key = f"recordings/{session.program_id}/{session.id}.webm"
+        recording_key = f"recordings/{session.program_id}/{session.id}.wav"
         if recording_bytes:
-            self.s3.put_bytes(recording_key, recording_bytes, content_type="audio/webm")
+            wav_bytes = pcm16le_to_wav(recording_bytes)
+            self.s3.put_bytes(recording_key, wav_bytes, content_type="audio/wav")
             session.recording_s3_key = recording_key
 
         session.transcript = transcript
