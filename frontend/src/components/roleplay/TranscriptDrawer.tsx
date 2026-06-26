@@ -31,7 +31,9 @@ export function TranscriptDrawer({
       {open && (
         <ul className="transcript-list">
           {messages.length === 0 && !partialText && (
-            <li className="transcript-empty">会話が始まるとここに表示されます</li>
+            <li className="transcript-empty">
+              会話が始まるとここに表示されます
+            </li>
           )}
           {messages.map((m, i) => (
             <li key={i} className={m.speaker}>

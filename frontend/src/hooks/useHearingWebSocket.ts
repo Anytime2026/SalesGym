@@ -75,38 +75,35 @@ export function useHearingWebSocket({
     }
   }, [ensurePlaybackContext])
 
-  const playWithHtmlAudio = useCallback(
-    (blob: Blob) => {
-      const url = URL.createObjectURL(blob)
-      const audio = new Audio(url)
-      activeSourcesRef.current += 1
-      setAiSpeaking(true)
+  const playWithHtmlAudio = useCallback((blob: Blob) => {
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    activeSourcesRef.current += 1
+    setAiSpeaking(true)
 
-      const onDone = () => {
-        URL.revokeObjectURL(url)
-        activeSourcesRef.current -= 1
-        if (activeSourcesRef.current <= 0) {
-          activeSourcesRef.current = 0
-          setAiSpeaking(false)
-        }
+    const onDone = () => {
+      URL.revokeObjectURL(url)
+      activeSourcesRef.current -= 1
+      if (activeSourcesRef.current <= 0) {
+        activeSourcesRef.current = 0
+        setAiSpeaking(false)
       }
+    }
 
-      audio.addEventListener('ended', onDone, { once: true })
-      audio.addEventListener(
-        'error',
-        () => {
-          onDone()
-        },
-        { once: true },
-      )
-
-      void audio.play().catch(() => {
-        useHtmlAudioRef.current = true
+    audio.addEventListener('ended', onDone, { once: true })
+    audio.addEventListener(
+      'error',
+      () => {
         onDone()
-      })
-    },
-    [],
-  )
+      },
+      { once: true },
+    )
+
+    void audio.play().catch(() => {
+      useHtmlAudioRef.current = true
+      onDone()
+    })
+  }, [])
 
   const scheduleWebAudio = useCallback(
     async (blob: Blob, ctx: AudioContext) => {

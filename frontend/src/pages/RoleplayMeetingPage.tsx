@@ -139,8 +139,7 @@ export function RoleplayMeetingPage() {
     }
   }, [ws, stop])
 
-  const pttDisabled =
-    !ws.connected || ws.processing || ws.aiSpeaking
+  const pttDisabled = !ws.connected || ws.processing || ws.aiSpeaking
 
   usePttKeyboard({
     enabled: Boolean(session) && !ended && micReady,

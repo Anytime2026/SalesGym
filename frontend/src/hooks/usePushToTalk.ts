@@ -40,7 +40,7 @@ function downsampleBuffer(
 function isStreamUsable(stream: MediaStream | null): stream is MediaStream {
   return Boolean(
     stream?.active &&
-      stream.getAudioTracks().some((track) => track.readyState === 'live'),
+    stream.getAudioTracks().some((track) => track.readyState === 'live'),
   )
 }
 
@@ -112,7 +112,11 @@ export function usePushToTalk({
 
       processor.onaudioprocess = (event) => {
         const input = event.inputBuffer.getChannelData(0)
-        const downsampled = downsampleBuffer(input, inputRate, TARGET_SAMPLE_RATE)
+        const downsampled = downsampleBuffer(
+          input,
+          inputRate,
+          TARGET_SAMPLE_RATE,
+        )
         pendingRef.current.push(downsampled)
         sampleCountRef.current += downsampled.length
 

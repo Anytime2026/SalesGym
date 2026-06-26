@@ -4,7 +4,10 @@ const MIC_GRANTED_KEY = 'syodan-mic-granted'
 
 function micErrorMessage(err: unknown): string {
   if (err instanceof DOMException) {
-    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+    if (
+      err.name === 'NotAllowedError' ||
+      err.name === 'PermissionDeniedError'
+    ) {
       return 'マイクの使用が拒否されました。ブラウザの設定から許可してください。'
     }
     if (err.name === 'NotFoundError') {
