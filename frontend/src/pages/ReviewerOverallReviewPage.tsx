@@ -29,7 +29,11 @@ export function ReviewerOverallReviewPage() {
     setError(null)
     getOverallReviewPage(token)
       .then(setPage)
-      .catch(() => setError('総評ページの取得に失敗しました'))
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : '総評ページの取得に失敗しました',
+        ),
+      )
       .finally(() => setLoading(false))
   }, [token])
 
@@ -37,7 +41,11 @@ export function ReviewerOverallReviewPage() {
     if (!token) return
     getOverallReviewPage(token)
       .then(setPage)
-      .catch(() => setError('総評ページの取得に失敗しました'))
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : '総評ページの取得に失敗しました',
+        ),
+      )
   }
 
   const toggleSession = (num: number) => {
@@ -63,8 +71,10 @@ export function ReviewerOverallReviewPage() {
       setSubmitSuccess(true)
       setContent('')
       refreshPage()
-    } catch {
-      setSubmitError('総評の送信に失敗しました')
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : '総評の送信に失敗しました',
+      )
     } finally {
       setSubmitting(false)
     }

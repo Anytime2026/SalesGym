@@ -28,7 +28,7 @@
         },
         {
           "name": "CORS_ORIGINS",
-          "value": "http://localhost:5173,http://127.0.0.1:5173"
+          "value": "http://localhost:5173,http://127.0.0.1:5173,https://d3sqjmfezufvi4.cloudfront.net,https://sales-gym.org,https://www.sales-gym.org"
         },
         {
           "name": "S3_BUCKET_NAME",
@@ -36,9 +36,11 @@
         },
         {
           "name": "FRONTEND_BASE_URL",
-          "value": "https://d3sqjmfezufvi4.cloudfront.net"
+          "value": "https://sales-gym.org"
         },
-        { "name": "AWS_STUB_MODE", "value": "false" }
+        { "name": "AWS_STUB_MODE", "value": "false" },
+        { "name": "SLACK_STUB_MODE", "value": "false" },
+        { "name": "SLACK_EVALUATION_CHANNELS", "value": "C0BC9BW1DJQ" }
       ],
       "environmentFiles": [],
       "mountPoints": [],
@@ -71,6 +73,10 @@
         {
           "name": "SLACK_WEBHOOK_URL",
           "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:542000445970:secret:syodan/slack-webhook-Aq2FW8"
+        },
+        {
+          "name": "SLACK_BOT_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:542000445970:secret:syodan/slack-Sd8NXl"
         }
       ],
       "ulimits": [],

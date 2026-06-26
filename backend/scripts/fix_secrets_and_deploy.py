@@ -89,7 +89,7 @@ def register_and_deploy() -> str:
         if item["name"] not in env_names:
             env.append(item)
 
-    slack_ref = "arn:aws:secretsmanager:ap-northeast-1:542000445970:secret:syodan/slack-Sd8NXl::"
+    slack_ref = "arn:aws:secretsmanager:ap-northeast-1:542000445970:secret:syodan/slack-Sd8NXl"
     secrets = container.setdefault("secrets", [])
     updated = False
     for secret in secrets:

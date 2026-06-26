@@ -68,8 +68,11 @@ class EvaluationService:
         if session.status not in (
             SessionStatus.EVALUATION_REQUESTED.value,
             SessionStatus.EVALUATED.value,
+            SessionStatus.COMPLETED.value,
         ):
-            raise ValueError("Session is not accepting evaluations")
+            raise ValueError(
+                f"Session is not accepting evaluations (status={session.status})"
+            )
 
         existing = await self.db.execute(
             select(Evaluation).where(

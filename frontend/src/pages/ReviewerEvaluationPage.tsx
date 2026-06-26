@@ -32,7 +32,11 @@ export function ReviewerEvaluationPage() {
     setAudioError(false)
     getReviewPage(token)
       .then(setPage)
-      .catch(() => setError('評価ページの取得に失敗しました'))
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : '評価ページの取得に失敗しました',
+        ),
+      )
       .finally(() => setLoading(false))
   }, [token])
 
@@ -40,7 +44,11 @@ export function ReviewerEvaluationPage() {
     if (!token) return
     getReviewPage(token)
       .then(setPage)
-      .catch(() => setError('評価ページの取得に失敗しました'))
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : '評価ページの取得に失敗しました',
+        ),
+      )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,8 +65,10 @@ export function ReviewerEvaluationPage() {
       setSubmitSuccess(true)
       setContent('')
       refreshPage()
-    } catch {
-      setSubmitError('評価の送信に失敗しました')
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : '評価の送信に失敗しました',
+      )
     } finally {
       setSubmitting(false)
     }

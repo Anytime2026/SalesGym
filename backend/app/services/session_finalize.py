@@ -13,6 +13,7 @@ from app.domain.models import CustomerProfile, CustomerState, HearingSession, Pr
 from app.integrations.aws_clients import BedrockClient, S3Client
 from app.services.hulft_client import HulftClient
 from app.services.prompts import ANALYSIS_SYSTEM
+from app.services.slack_client import SlackClient
 from app.utils.audio import pcm16le_to_wav
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ class SessionFinalizeService:
         self.bedrock = BedrockClient()
         self.s3 = S3Client()
         self.hulft = HulftClient()
+        self.slack = SlackClient()
 
     async def finalize_session(
         self,
@@ -93,6 +95,7 @@ class SessionFinalizeService:
         await self.db.refresh(session)
 
         profile = program.customer_profile
+        frontend_base = get_settings().frontend_base_url.rstrip("/")
         await self.hulft.send_session_complete(
             session_id=session.id,
             program_id=program.id,
@@ -106,6 +109,17 @@ class SessionFinalizeService:
             },
         )
 
+        if conversation_log:
+            try:
+                await self.slack.send_evaluation_request(
+                    review_url=f"{frontend_base}/reviewer/evaluations/{session.review_token}",
+                    field=program.field,
+                    session_number=session.session_number,
+                    goal=session.goal,
+                )
+            except Exception:
+                logger.exception("Slack evaluation notification failed (session=%s)", session.id)
+
         if completed_count >= program.total_sessions:
             program.status = ProgramStatus.OVERALL_REVIEW_REQUESTED.value
             from app.services.evaluation_service import EvaluationService
@@ -116,6 +130,14 @@ class SessionFinalizeService:
                 program_id=program.id,
                 overall_review_token=overall_token,
             )
+            try:
+                await self.slack.send_overall_review_request(
+                    review_url=f"{frontend_base}/reviewer/overall-review/{overall_token}",
+                    field=program.field,
+                    total_sessions=program.total_sessions,
+                )
+            except Exception:
+                logger.exception("Slack overall review notification failed (program=%s)", program.id)
 
         return session
 

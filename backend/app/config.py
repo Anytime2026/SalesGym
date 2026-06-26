@@ -37,6 +37,7 @@ class Settings(BaseSettings):
 
     slack_bot_token: str | None = None
     slack_feedback_channels: str | None = None
+    slack_evaluation_channels: str | None = None
     slack_stub_mode: bool = True
 
     @model_validator(mode="after")

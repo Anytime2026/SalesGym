@@ -73,4 +73,4 @@ async def test_overall_review_page_and_submit(client: AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_overall_review_not_found_for_invalid_token(client: AsyncClient) -> None:
     res = await client.get("/api/review/overall/invalid-token-00000000000000000000000000000000")
-    assert res.status_code == 404
+    assert res.status_code == 400

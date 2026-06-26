@@ -110,7 +110,7 @@ async def test_submit_session_evaluation_upserts_same_evaluator(client: AsyncCli
 @pytest.mark.asyncio
 async def test_review_page_not_found_for_invalid_token(client: AsyncClient) -> None:
     res = await client.get("/api/review/invalid-token-00000000000000000000000000000000")
-    assert res.status_code == 404
+    assert res.status_code == 400
 
 
 @pytest.mark.asyncio

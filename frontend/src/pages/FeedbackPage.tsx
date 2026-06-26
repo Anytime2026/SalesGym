@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { PageSection, PageShell } from '../components/PageShell'
+import { useNavigate } from 'react-router-dom'
+import { PageActions, PageSection, PageShell } from '../components/PageShell'
 import { Button } from '../components/ui/Button'
 import { TextAreaField } from '../components/ui/Form'
 import { submitFeedback } from '../lib/api'
 
 export function FeedbackPage() {
+  const navigate = useNavigate()
   const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -59,6 +61,12 @@ export function FeedbackPage() {
           </Button>
         </form>
       </PageSection>
+
+      <PageActions>
+        <Button variant="gray" className="btn--shrink" onClick={() => navigate('/')}>
+          戻る
+        </Button>
+      </PageActions>
     </PageShell>
   )
 }

@@ -22,7 +22,7 @@ async def get_overall_review_page(
     service = EvaluationService(db)
     page = await service.get_overall_review_page(token)
     if not page:
-        raise HTTPException(status_code=404, detail="Overall review page not found")
+        raise HTTPException(status_code=400, detail="Overall review page not found")
     return page
 
 
@@ -42,7 +42,7 @@ async def get_session_recording(token: str, db: AsyncSession = Depends(get_db)) 
     service = EvaluationService(db)
     recording = await service.get_session_recording(token)
     if not recording:
-        raise HTTPException(status_code=404, detail="Recording not found")
+        raise HTTPException(status_code=400, detail="Recording not found")
     body, media_type = recording
     return Response(
         content=body,
@@ -56,7 +56,7 @@ async def get_review_page(token: str, db: AsyncSession = Depends(get_db)) -> Rev
     service = EvaluationService(db)
     page = await service.get_review_page(token)
     if not page:
-        raise HTTPException(status_code=404, detail="Review page not found")
+        raise HTTPException(status_code=400, detail="Review page not found")
     return page
 
 

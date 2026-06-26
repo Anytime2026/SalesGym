@@ -58,11 +58,23 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     ...options,
   })
+  const body = await res.text()
   if (!res.ok) {
-    const body = await res.text()
     throw new Error(parseApiErrorMessage(body, res.status))
   }
-  return res.json() as Promise<T>
+  if (!body) {
+    return undefined as T
+  }
+  try {
+    return JSON.parse(body) as T
+  } catch {
+    throw new Error(
+      parseApiErrorMessage(
+        body.startsWith('<!') ? 'APIがHTMLを返しました。ページを再読み込みしてください。' : body,
+        res.status,
+      ),
+    )
+  }
 }
 
 export function submitFeedback(message: string): Promise<{ ok: boolean }> {
