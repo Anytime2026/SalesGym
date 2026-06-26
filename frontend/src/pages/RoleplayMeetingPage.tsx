@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ControlBar } from '../components/roleplay/ControlBar'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { MeetingShell } from '../components/roleplay/MeetingShell'
+import { MicPermissionGate } from '../components/roleplay/MicPermissionGate'
 import { ParticipantTile } from '../components/roleplay/ParticipantTile'
 import { TranscriptDrawer } from '../components/roleplay/TranscriptDrawer'
 import '../components/roleplay/roleplay.css'
 import { useHearingWebSocket } from '../hooks/useHearingWebSocket'
 import { useDeferredLoading } from '../hooks/useDeferredLoading'
+import { isMicrophoneGranted } from '../hooks/useMicrophonePermission'
 import { usePingInterval, useSessionTimer } from '../hooks/useSessionTimer'
 import { usePttKeyboard } from '../hooks/usePttKeyboard'
 import { usePushToTalk } from '../hooks/usePushToTalk'
@@ -20,8 +22,15 @@ export function RoleplayMeetingPage() {
   const [session, setSession] = useState<HearingSession | null>(null)
   const [program, setProgram] = useState<Program | null>(null)
   const [ended, setEnded] = useState(false)
-  const [transcriptOpen, setTranscriptOpen] = useState(true)
+  const [transcriptOpen, setTranscriptOpen] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      !window.matchMedia('(max-width: 576px)').matches,
+  )
   const [userSpeaking, setUserSpeaking] = useState(false)
+  const [micReady, setMicReady] = useState(isMicrophoneGranted)
+  const pttPressedRef = useRef(false)
+  const pttActiveRef = useRef(false)
   const sessionLoading = !session && Boolean(sessionId)
   const showLoadingScreen = useDeferredLoading(sessionLoading)
 
@@ -45,7 +54,7 @@ export function RoleplayMeetingPage() {
 
   const ws = useHearingWebSocket({
     sessionId: sessionId ?? '',
-    enabled: Boolean(sessionId) && !ended,
+    enabled: Boolean(sessionId) && !ended && micReady,
     onSessionEnded: handleSessionEnded,
   })
 
@@ -59,6 +68,7 @@ export function RoleplayMeetingPage() {
   const { recording, start, stop } = usePushToTalk({
     onChunk: ws.sendAudioChunk,
     disabled: ws.processing || ws.aiSpeaking || ended,
+    pressedRef: pttPressedRef,
   })
 
   useEffect(() => {
@@ -106,21 +116,33 @@ export function RoleplayMeetingPage() {
   }
 
   const handlePttDown = useCallback(async () => {
-    setUserSpeaking(true)
+    pttPressedRef.current = true
+    void ws.primeAudioPlayback()
+    const ok = await start()
+    if (!ok || !pttPressedRef.current) {
+      setUserSpeaking(false)
+      if (ok) await stop()
+      return
+    }
     ws.pttStart()
-    await start()
-  }, [ws, start])
+    pttActiveRef.current = true
+    setUserSpeaking(true)
+  }, [ws, start, stop])
 
   const handlePttUp = useCallback(async () => {
+    pttPressedRef.current = false
     setUserSpeaking(false)
-    await stop()
-    ws.pttEnd()
+    const wasActive = await stop()
+    if (pttActiveRef.current || wasActive) {
+      ws.pttEnd()
+      pttActiveRef.current = false
+    }
   }, [ws, stop])
 
-  const pttDisabled = !ws.connected || ws.processing
+  const pttDisabled = !ws.connected || ws.processing || ws.aiSpeaking
 
   usePttKeyboard({
-    enabled: Boolean(session) && !ended,
+    enabled: Boolean(session) && !ended && micReady,
     disabled: pttDisabled,
     onPttDown: handlePttDown,
     onPttUp: handlePttUp,
@@ -150,41 +172,52 @@ export function RoleplayMeetingPage() {
     )
   }
 
+  if (!micReady) {
+    return <MicPermissionGate onGranted={() => setMicReady(true)} />
+  }
+
   return (
     <MeetingShell
       timerLabel={label}
       timerWarning={warning}
       sessionInfo={`第${session.session_number}回 — ${session.goal}`}
     >
-      <div className="participant-grid">
-        <ParticipantTile
-          name="あなた"
-          role="営業担当"
-          speaking={userSpeaking}
-          avatarLabel="営"
-        />
-        <ParticipantTile
-          name={customerName ? `${customerName} 様` : '顧客AI'}
-          role={customerRole}
-          speaking={ws.aiSpeaking}
-          avatarLabel={customerName ? customerName.charAt(0) : '顧'}
+      <div className="meeting-stage">
+        <div className="meeting-content-area">
+          <div className="participant-grid">
+            <ParticipantTile
+              name="あなた"
+              role="営業担当"
+              speaking={userSpeaking}
+              avatarLabel="営"
+            />
+            <ParticipantTile
+              name={customerName ? `${customerName} 様` : '顧客AI'}
+              role={customerRole}
+              speaking={ws.aiSpeaking}
+              avatarLabel={customerName ? customerName.charAt(0) : '顧'}
+            />
+          </div>
+          <TranscriptDrawer
+            messages={ws.transcripts}
+            partialText={ws.partialTranscript}
+            open={transcriptOpen}
+            onToggle={() => setTranscriptOpen((o) => !o)}
+          />
+          {ws.lastError && (
+            <p className="meeting-error setup-error">{ws.lastError}</p>
+          )}
+        </div>
+        <ControlBar
+          recording={recording}
+          processing={ws.processing}
+          aiSpeaking={ws.aiSpeaking}
+          connected={ws.connected}
+          onPttDown={handlePttDown}
+          onPttUp={handlePttUp}
+          onEnd={handleEnd}
         />
       </div>
-      <TranscriptDrawer
-        messages={ws.transcripts}
-        partialText={ws.partialTranscript}
-        open={transcriptOpen}
-        onToggle={() => setTranscriptOpen((o) => !o)}
-      />
-      {ws.lastError && <p className="setup-error">{ws.lastError}</p>}
-      <ControlBar
-        recording={recording}
-        processing={ws.processing}
-        connected={ws.connected}
-        onPttDown={handlePttDown}
-        onPttUp={handlePttUp}
-        onEnd={handleEnd}
-      />
     </MeetingShell>
   )
 }
