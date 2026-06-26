@@ -60,7 +60,7 @@ export function RoleplayMeetingPage() {
 
   usePingInterval(ws.ping)
 
-  const { label, warning, expired } = useSessionTimer(
+  const { label, warning } = useSessionTimer(
     session?.started_at ?? null,
     session?.time_limit_minutes ?? 15,
   )
@@ -81,12 +81,6 @@ export function RoleplayMeetingPage() {
       .then(setProgram)
       .catch(() => navigate('/settings'))
   }, [sessionId, navigate])
-
-  useEffect(() => {
-    if (expired && !ended && sessionId) {
-      handleSessionEnded('timeout')
-    }
-  }, [expired, ended, sessionId, handleSessionEnded])
 
   useEffect(() => {
     const onUnload = () => {

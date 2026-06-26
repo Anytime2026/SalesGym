@@ -238,9 +238,6 @@ async def hearing_websocket(websocket: WebSocket, session_id: UUID) -> None:
                 ):
                     time_warning_sent = True
                     await websocket.send_json({"type": "time_warning", "remaining_sec": remaining})
-                if remaining <= 0:
-                    await websocket.send_json({"type": "session_ended", "reason": "timeout"})
-                    break
 
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected for session %s", session_id)
