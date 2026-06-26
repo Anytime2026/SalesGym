@@ -131,7 +131,7 @@ export function SettingsPage() {
       width="wide"
       title="新規商談作成"
       subtitle="AI顧客との商談シリーズを開始します。業界や顧客設定を選んでください。"
-      illustration="/images/PC.svg"
+      illustration="/images/PCbear-closeEyes-CloseMouce.svg"
     >
       <div className="settings-grid">
         <PageSection variant="paper">
